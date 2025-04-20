@@ -6,7 +6,6 @@ import type { ChildrenType } from "@/types";
 
 const MainProvider = ({ children }: ChildrenType) => {
     const [queryClient] = useState(new QueryClient())
-    // if (typeof window !== 'undefined') return null
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider

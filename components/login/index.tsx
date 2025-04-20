@@ -85,7 +85,6 @@
 //   );
 // };
 
-// export default GlassLogin;
 
 "use client";
 
@@ -111,7 +110,7 @@ const formSchema = z.object({
   password: z.string().min(8, "Kamida 8 ta belgi bo‘lishi kerak"),
 });
 
-export const LoginComponents = () => {
+const LoginComponents = () => {
   const { mutate, isPending } = useLoginMutation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -187,3 +186,4 @@ export const LoginComponents = () => {
     </div>
   );
 };
+export default LoginComponents;

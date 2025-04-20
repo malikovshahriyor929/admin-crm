@@ -1,5 +1,5 @@
-import { LoginComponents } from "@/components/login";
 import React from "react";
+import LoginComponents from "@/components/login";
 
 const Login = () => {
   return (
