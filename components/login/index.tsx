@@ -89,7 +89,7 @@
 
 "use client";
 
-import React, { FormEvent } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -111,7 +111,7 @@ const formSchema = z.object({
   password: z.string().min(8, "Kamida 8 ta belgi bo‘lishi kerak"),
 });
 
-const GlassLogin = () => {
+export const LoginComponents = () => {
   const { mutate, isPending } = useLoginMutation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
