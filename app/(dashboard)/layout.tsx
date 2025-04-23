@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import MainProvider from "@/provider/mainProvider";
+import { Toaster } from "sonner";
+import SideBar from "@/components/sidebar";
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,11 +25,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className}  antialiased`} >
-
-          <MainProvider>{children}</MainProvider>
-
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className}  antialiased`}>
+        <SidebarProvider>
+          <Sidebar>
+            <SideBar />
+          </Sidebar>
+          <main className="fle  h-scree  ">
+            <SidebarTrigger />
+            <MainProvider>{children}</MainProvider>
+          </main>
+        </SidebarProvider>
+        <Toaster position="top-center" />
       </body>
     </html>
   );
