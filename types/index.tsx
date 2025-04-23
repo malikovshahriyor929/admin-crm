@@ -9,3 +9,20 @@ export interface SidebarType {
   icon: ReactNode;
   path: string;
 }
+export interface User {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  image: string;
+  role: string;
+  status: string;
+  token: string;
+  active: boolean;
+  is_deleted: boolean;
+  createdAt: string;         // ISO date string
+  updatedAt: string;         // ISO date string
+  work_date: string;         // ISO date string
+  work_end: string | null;   // null or ISO date string
+  last_active_date: string;  // ISO date string
+}

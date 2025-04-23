@@ -9,9 +9,7 @@ export function DarkMode() {
 
   useEffect(() => {
     const saved = localStorage.getItem("as");
-    // if (saved !== null) {
       setCheck(JSON.parse(saved as string)||false);
-    // }
   }, []);
 
   const toggleTheme = () => {
@@ -35,7 +33,7 @@ export function DarkMode() {
           className={` ${!check ? "hidden" : "flex"}`}
         >
           <Moon
-            className={` absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100`}
+            className={` absolute h-[1.2rem] w-[1.2rem]  scale-100 transition-all dark:rotate-0 dark:scale-100`}
           />
         </Button>
         <Button
