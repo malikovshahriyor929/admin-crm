@@ -9,7 +9,17 @@ import { User } from "@/types";
 
 const Header = () => {
   const pathname = usePathname();
-  const userInfo: User = JSON.parse(Cookies?.get("user") as string) || {};
+  // const userInfo: User
+  let userInfo: User | null = null ;
+  const userCookie = Cookies.get("user");
+
+  if (userCookie) {
+    try {
+      userInfo = JSON.parse(userCookie);
+    } catch (err) {
+      console.error("Invalid JSON in user cookie", err);
+    }
+  }
 
   return (
     <div className="p-3 border-b border-foreground/40 w-full flex items-center justify-between">
@@ -39,7 +49,8 @@ const Header = () => {
             </h1>
             <p className=" flex items-center gap-1 text-sm">
               <Users size={16} />
-              {userInfo.role.slice(0, 1).toUpperCase() + userInfo.role.slice(1)}
+              {userInfo?.role.slice(0, 1).toUpperCase() +
+                userInfo!.role.slice(1)}
             </p>
           </div>
           <CircleUser size={35} />
