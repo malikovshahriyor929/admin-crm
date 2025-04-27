@@ -1,7 +1,11 @@
 import { notificationApi } from "@/shared/generics/notification";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Cookie from "js-cookie";
+import { Myaxios } from "../axios";
+import { User } from "@/types";
+import { AddType } from "@/components/admins-table/admin-add";
+import { EditProfileType } from "@/components/profile-update";
 const notify = notificationApi();
 export const useLoginMutation = () => {
   return useMutation({
@@ -20,6 +24,75 @@ export const useLoginMutation = () => {
     },
     onError() {
       notify("wrong_login");
+    },
+  });
+};
+
+export const editCase = () => {
+  const queryClient = useQueryClient();
+  return (data: any) => {
+    return queryClient.setQueryData(["admins"], (old: User[]) => {
+      return old.map((value) =>
+        value._id === data._id ? { ...value, ...data } : value
+      );
+    });
+  };
+};
+
+export const useEditMutation = () => {
+  const editCases = editCase();
+  return useMutation({
+    mutationKey: ["edit"],
+    mutationFn: (data: object) => {
+      editCases(data);
+      return Myaxios.post("/api/staff/edited-admin", data);
+    },
+  });
+};
+
+export const deleteAdminCase = () => {
+  const queryClient = useQueryClient();
+  return (data: any) => {
+    return queryClient.setQueryData(["admins"], (old: User[]) => {
+      return old.map((value) =>
+        value._id === data._id ? { ...value, ...data } : value
+      );
+    });
+  };
+};
+
+export const AddAdminCase = () => {
+  const queryClient = useQueryClient();
+  return (data: any) => {
+    return queryClient.setQueryData(["admins"], (old: User[]) => {
+      return [...old, { ...data }];
+    });
+  };
+};
+
+export const useAddAdminMutaion = () => {
+  const AddAdminCas = AddAdminCase();
+  return useMutation({
+    mutationKey: ["addFn"],
+    mutationFn: (data: AddType) => {
+      AddAdminCas(data);
+      return Myaxios.post("/api/staff/create-admin", data);
+    },
+    onSuccess(data) {
+      notify("add");
+      console.log(data);
+    },
+  });
+};
+
+export const useEditProfileMutaion = () => {
+  return useMutation({
+    mutationKey: ["editProfile"],
+    mutationFn: (data: EditProfileType) => {
+      return Myaxios.post("/api/auth/edit-profile", data);
+    },
+    onSuccess() {
+      notify("edit");
     },
   });
 };

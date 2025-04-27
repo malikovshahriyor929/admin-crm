@@ -7,15 +7,17 @@ import React from "react";
 import { LogOut } from "lucide-react";
 import Cookie from "js-cookie";
 import { notificationApi } from "@/shared/generics/notification";
+import { SidebarTrigger } from "../ui/sidebar";
 
 const SideBar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const notify = notificationApi();
   return (
-    <div className="w-[300px border-r border-foreground/40 h-full bg-background">
-      <div className="p-4">
+    <div className="w-[300px border-r border-foreground/40 h-full bg-background max-[350px]:">
+      <div className="p-4 flex items-center justify-between">
         <h1 className=" font-bold">Admin CRM</h1>
+        <SidebarTrigger className="hidden max-[400px]:flex" />
       </div>
       <div className="p-4 h-[calc(100vh-3.5rem) overflow-y-scrol">
         <h2 className="font-semibold  mb-4">Menu</h2>

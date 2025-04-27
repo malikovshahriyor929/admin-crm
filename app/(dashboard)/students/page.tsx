@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
 
 const Students = () => {
-  return (
-    <div>Students</div>
-  )
-}
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["ashb"],
+  //   queryFn: () =>
+  //     Myaxios.get("/api/staff/all-managers").then((res) => res.data.data),
+  // });
+  return <div>Students</div>;
+};
 
-export default Students
+export default Students;

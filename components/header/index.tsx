@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SidebarTrigger } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
 import { ChevronRight, CircleUser, Users } from "lucide-react";
@@ -9,17 +9,19 @@ import { User } from "@/types";
 
 const Header = () => {
   const pathname = usePathname();
-  // const userInfo: User
-  let userInfo: User | null = null ;
-  const userCookie = Cookies.get("user");
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
-  if (userCookie) {
-    try {
-      userInfo = JSON.parse(userCookie);
-    } catch (err) {
-      console.error("Invalid JSON in user cookie", err);
+  useEffect(() => {
+    const cookie = Cookies.get("user");
+    if (cookie) {
+      try {
+        const parsed = JSON.parse(cookie);
+        setUserInfo(parsed);
+      } catch (err) {
+        console.error("Cookie parsing error", err);
+      }
     }
-  }
+  }, []);
 
   return (
     <div className="p-3 border-b border-foreground/40 w-full flex items-center justify-between">
@@ -27,12 +29,12 @@ const Header = () => {
         <SidebarTrigger />
         <div>
           <div className="flex items-center gap-2 ">
-            <p className="font-medium"> Asosiy</p>
+            <p className="font-medium max-[500px]:text-sm max-[425px]:hidden"> Asosiy</p>
             <ChevronRight
               size={18}
-              className={`${pathname == "/" && "hidden"}`}
+              className={`${pathname == "/" && "hidden"} max-[425px]:hidden`}
             />
-            <p>
+            <p className="max-[500px]:text-sm">
               {pathname == "/"
                 ? ""
                 : pathname.slice(1, 2).toUpperCase() + pathname.slice(2)}
@@ -44,16 +46,26 @@ const Header = () => {
         <DarkMode />
         <div className="flex items-center  gap-2">
           <div className="flex flex-col items-end">
-            <h1>
+            <h1 className="max-[500px]:text-sm max-[342px]:hidden">
               {userInfo?.first_name} {userInfo?.last_name}
             </h1>
-            <p className=" flex items-center gap-1 text-sm">
-              <Users size={16} />
-              {userInfo?.role.slice(0, 1).toUpperCase() +
-                userInfo!.role.slice(1)}
-            </p>
+            {userInfo?.role && (
+              <p className="flex items-center gap-1 text-sm max-[500px]:text-[12px] max-[342px]:hidden">
+                <Users size={16} className="max-[500px]:text-sm" />
+                {userInfo.role.slice(0, 1).toUpperCase() +
+                  userInfo.role.slice(1)}
+              </p>
+            )}
           </div>
-          <CircleUser size={35} />
+          {userInfo?.image ? (
+            <img
+              src={userInfo.image}
+              className="size-10 rounded-full object-cover"
+              alt=""
+            />
+          ) : (
+            <CircleUser size={35} className="!text-foreground" />
+          )}
         </div>
       </div>
     </div>
