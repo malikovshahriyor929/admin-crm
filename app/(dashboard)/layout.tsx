@@ -23,9 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className}  antialiased`}>
-        <MainProvider>
-          <SidebarProvider>
+      <body className={`${inter.className}  antialiased`} suppressHydrationWarning>
+        <MainProvider >
+          <SidebarProvider suppressHydrationWarning>
             <Sidebar>
               <SideBar />
             </Sidebar>

@@ -9,22 +9,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { User } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Myaxios } from "@/request/axios";
 import { Skeleton } from "../ui/skeleton";
+import { notificationApi } from "@/shared/generics/notification";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 const TableComponent = () => {
-  const { data, isLoading,isError
-   } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["ashb"],
     queryFn: () =>
       Myaxios.get("/api/staff/all-managers").then((res) => res.data.data),
   });
+  const notify = notificationApi();
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Foydalanuvchilar ro'yxati</h2>
+      <h2 className="text-xl font-semibold mb-4">Foydalanuvchilar ro&apos;yxati</h2>
       <Table>
         <TableHeader>
           <TableRow>
@@ -37,7 +44,7 @@ const TableComponent = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {!isLoading||!isError
+          {!isLoading || isError
             ? data?.map((user: User) => (
                 <TableRow key={user._id}>
                   <TableCell>{user.first_name}</TableCell>
@@ -45,13 +52,21 @@ const TableComponent = () => {
                   <TableCell>{user.email}</TableCell>
                   <TableCell className="capitalize">{user.role}</TableCell>
                   <TableCell>{user.status}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button size="sm" variant="outline">
-                      <Pencil className="w-4 h-4 mr-1" /> Tahrirlash
-                    </Button>
-                    <Button size="sm" variant="destructive">
-                      <Trash2 className="w-4 h-4 mr-1" /> O'chirish
-                    </Button>
+                  <TableCell
+                    onClick={() => notify("error_admin")}
+                    className="text-right space-x-2 flex justify-center "
+                  >
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild className="">
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Tahrirlash</DropdownMenuItem>
+                        <DropdownMenuItem>O&apos;chirish</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -79,7 +94,7 @@ const TableComponent = () => {
                         <Pencil className="w-4 h-4 mr-1" /> Tahrirlash
                       </Button>
                       <Button size="sm" variant="destructive">
-                        <Trash2 className="w-4 h-4 mr-1" /> O'chirish
+                        <Trash2 className="w-4 h-4 mr-1" /> O&apos;chirish
                       </Button>
                     </TableCell>
                   </TableRow>

@@ -9,12 +9,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { User } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Myaxios } from "@/request/axios";
 import { Skeleton } from "../ui/skeleton";
-import { deleteAdminCase, useEditMutation } from "@/request/mutation";
+import {
+  deleteAdminCase,
+  useEditMutation,
+  useTatildaMutaion,
+} from "@/request/mutation";
 import Cookies from "js-cookie";
 import {
   Dialog,
@@ -36,20 +40,32 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Admin_tools from "./admin-add";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
   first_name: z.string().min(5),
 });
 
+const tatilSchema = z.object({
+  start_date: z.string(),
+  end_date: z.string(),
+  reason: z.string().min(5),
+});
+
 const AdminsTableComponent = () => {
   const { mutate } = useEditMutation();
   const [open, setOpen] = useState(false);
+  const [tatil, setTatil] = useState({ bool: false, id: "" });
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  // const [selectedUserForDelete, setSelectedUserForDelete] =
-  //   useState<User | null>(null);
   const deleteAdminCas = deleteAdminCase();
-  const { data, isLoading, isError } = useQuery({
+  const { mutate: tatilMutate } = useTatildaMutaion();
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["admins"],
     queryFn: () =>
       Myaxios.get("/api/staff/all-admins").then((res) => res.data.data),
@@ -62,6 +78,16 @@ const AdminsTableComponent = () => {
       first_name: "",
     },
   });
+  const tatilForm = useForm<z.infer<typeof tatilSchema>>({
+    resolver: zodResolver(tatilSchema),
+    defaultValues: {
+      start_date: "",
+      end_date: "",
+      reason: "",
+    },
+  });
+  const userCookie = Cookies.get("user");
+  const user = userCookie ? JSON.parse(userCookie) : null;
   const editAdmin = (values: z.infer<typeof formSchema>) => {
     mutate(
       {
@@ -87,18 +113,32 @@ const AdminsTableComponent = () => {
         Authorization: `Bearer ${Cookies.get("token")}`,
       },
     }).then(() => {
-      // if (selectedUserForDelete?._id) {
       deleteAdminCas(data);
-      // }
     });
   };
-  const userCookie = Cookies.get("user");
-  const user = userCookie ? JSON.parse(userCookie) : null;
-
+  const tatilFn = (values: z.infer<typeof tatilSchema>) => {
+    tatilMutate(
+      { ...values, _id: tatil.id },
+      {
+        onSuccess() {
+          setTatil({ bool: false, id: "" });
+          tatilForm.reset();
+          refetch();
+        },
+      }
+    );
+  };
+  const tatildanChiqish = (id: string) => {
+    Myaxios.post("/api/staff/leave-exit-staff", { _id: id }).then(() =>
+      refetch()
+    );
+  };
   return (
     <div className=" relative">
       <div className="flex items-center justify-between  ">
-        <h2 className="text-xl font-semibold mb-4 max-[400px]:text-lg">Aminlar ro'yxati</h2>
+        <h2 className="text-xl font-semibold mb-4 max-[400px]:text-lg">
+          Aminlar ro&apos;yxati
+        </h2>
         <div>{user?.role == "manager" && <Admin_tools />}</div>
       </div>
       <Table>
@@ -122,27 +162,44 @@ const AdminsTableComponent = () => {
                     <TableCell>{user.email}</TableCell>
                     <TableCell className="capitalize">{user.role}</TableCell>
                     <TableCell>{user.status}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          form.setValue("email", user.email);
-                          form.setValue("last_name", user.last_name);
-                          form.setValue("first_name", user.first_name);
-                          setOpen(true);
-                        }}
-                        size="sm"
-                        variant="outline"
-                      >
-                        <Pencil className="w-4 h-4 mr-1" /> Tahrirlash
-                      </Button>
-                      <Button
-                        onClick={() => delteAdmin(user)}
-                        size="sm"
-                        variant="destructive"
-                      >
-                        <Trash2 className="w-4 h-4 mr-1" /> O'chirish
-                      </Button>
+                    <TableCell className="text-right space-x-2 flex justify-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild className="">
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedUser(user);
+                              form.setValue("email", user.email);
+                              form.setValue("last_name", user.last_name);
+                              form.setValue("first_name", user.first_name);
+                              setOpen(true);
+                            }}
+                          >
+                            Tahrirlash
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => delteAdmin(user)}>
+                            O&apos;chirish
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              setTatil({ bool: true, id: user._id })
+                            }
+                          >
+                            Ta&apos;tilga chiqarish
+                          </DropdownMenuItem>
+                          {user.status == "ta'tilda" && (
+                            <DropdownMenuItem
+                              onClick={() => tatildanChiqish(user._id)}
+                            >
+                              Tatildan chiqrish
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </Dialog>
                 </TableRow>
@@ -167,17 +224,23 @@ const AdminsTableComponent = () => {
                       <Skeleton className="h-5 w-full" />
                     </TableCell>
                     <TableCell className="text-right space-x-2">
-                      <Button size="sm" variant="outline">
-                        <Pencil className="w-4 h-4 mr-1" /> Tahrirlash
-                      </Button>
-                      <Button size="sm" variant="destructive">
-                        <Trash2 className="w-4 h-4 mr-1" /> O'chirish
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild className="">
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Tahrirlash</DropdownMenuItem>
+                          <DropdownMenuItem>O&apos;hirish</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
         </TableBody>
       </Table>
+      {/* edit modal */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
@@ -231,6 +294,70 @@ const AdminsTableComponent = () => {
               />
               <DialogFooter>
                 <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      {/* tatil modal */}
+      <Dialog
+        open={tatil.bool}
+        onOpenChange={() => setTatil({ bool: !tatil.bool, id: "" })}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tatilga chiqarish</DialogTitle>
+          </DialogHeader>
+          <Form {...tatilForm}>
+            <form
+              onSubmit={tatilForm.handleSubmit(tatilFn)}
+              className="grid gap-4 py-4"
+            >
+              <FormField
+                control={tatilForm.control}
+                name="start_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-foreground">
+                      Boshlanish sanasi
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="2025-05-1" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={tatilForm.control}
+                name="end_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-foreground">
+                      Tugash sanasi
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="2025-05-1" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={tatilForm.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-foreground">Sabab</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Tobi yoq" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit">Yuborish</Button>
               </DialogFooter>
             </form>
           </Form>

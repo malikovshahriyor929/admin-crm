@@ -78,7 +78,7 @@ const Admin_tools = () => {
     <div className="flex items-center gap-4">
       <Button className="mb-4" onClick={() => setOpen(!open)} size="sm">
         <Plus className="max-[342px]:!flex" />
-        <p className="max-[342px]:hidden ">Admin Qo'shish</p>
+        <p className="max-[342px]:hidden ">Admin Qo&apos;shish</p>
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

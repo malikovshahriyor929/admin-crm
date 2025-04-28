@@ -15,14 +15,20 @@ export interface User {
   last_name: string;
   email: string;
   image: string;
-  role: string;
-  status: string;
-  token: string;
-  active: boolean;
-  is_deleted: boolean;
-  createdAt: string;         // ISO date string
-  updatedAt: string;         // ISO date string
-  work_date: string;         // ISO date string
-  work_end: string | null;   // null or ISO date string
-  last_active_date: string;  // ISO date string
+  role?: string;
+  status?: string;
+  token?: string;
+  active?: boolean;
+  is_deleted?: boolean;
+  createdAt?: string; // ISO date string
+  updatedAt?: string; // ISO date string
+  work_date?: string; // ISO date string
+  work_end?: string | null; // null or ISO date string
+  last_active_date?: string; // ISO date string
+}
+export interface TatilType {
+  _id: string;
+  start_date: string;
+  end_date: string;
+  reason: string;
 }

@@ -8,6 +8,7 @@ import { FaCamera } from "react-icons/fa";
 import { Myaxios } from "@/request/axios";
 import { User } from "@/types";
 import Profile_tools from "@/components/profile-update";
+import Image from "next/image";
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -20,16 +21,19 @@ const Profile = () => {
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [_, setFile] = useState<File | null>(null);
+  const [, setFile] = useState<File | null>(null);
 
   const cookieData = Cookies.get("user");
   useEffect(() => {
-    if (cookieData) {
-      try {
-        const parsed = JSON.parse(cookieData);
-        setUserInfo(parsed);
-      } catch (err) {
-        console.error("Invalid JSON in cookie", err);
+    if (typeof window !== "undefined") {
+      const cookieData = Cookies.get("user");
+      if (cookieData) {
+        try {
+          const parsed = JSON.parse(cookieData);
+          setUserInfo(parsed);
+        } catch (err) {
+          console.error("Invalid JSON in cookie", err);
+        }
       }
     }
   }, []);
@@ -68,6 +72,10 @@ const Profile = () => {
       console.error("Error uploading:", error);
     }
   };
+//   const isBrowser = typeof window !== "undefined";
+// const formattedDate = isBrowser
+//   ? new Date(userInfo?.createdAt).toLocaleString("uz-UZ")
+//   : userInfo?.createdAt;
 
   return (
     <div className="p-6 space-y-6">
@@ -75,9 +83,11 @@ const Profile = () => {
         <div className="flex items-center gap-4 max-[380px]:flex-col ">
           <div className="relative cursor-pointer" onClick={handleAvatarClick}>
             {userInfo.image ? (
-              <img
+              <Image
                 src={userInfo.image}
                 alt=""
+                width={80}
+                height={80}
                 className="w-20 h-20 rounded-full object-cover"
               />
             ) : (
@@ -104,8 +114,8 @@ const Profile = () => {
             <div className="flex items-center gap-2 text-sm mt-2">
               <Calendar size={16} />
               <p className="max-[800px]:text-sm">
-                Qo'shilgan:
-                {new Date(userInfo?.createdAt).toLocaleString("uz-UZ")}
+                Qo&apos;shilgan:
+                {new Date(userInfo.createdAt).toLocaleDateString("uz-UZ")}
               </p>
             </div>
           </div>
@@ -118,9 +128,9 @@ const Profile = () => {
       </div>
 
       <div className="rounded-xl shadow p-6">
-        <h2 className="text-lg font-semibold mb-2">Profil ma'lumotlari</h2>
+        <h2 className="text-lg font-semibold mb-2">Profil ma&apos;lumotlari</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Shaxsiy ma'lumotlaringizni yangilashingiz mumkin.
+          Shaxsiy ma&apos;lumotlaringizni yangilashingiz mumkin.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -141,8 +151,8 @@ const Profile = () => {
           </div>
         </div>
         <div className="flex justify-end mt-6">
-          <Profile_tools userInfo={userInfo} setUserInfo={setUserInfo}/>
-        </div> 
+          <Profile_tools userInfo={userInfo} setUserInfo={setUserInfo} />
+        </div>
       </div>
     </div>
   );

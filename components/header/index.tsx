@@ -6,6 +6,7 @@ import { ChevronRight, CircleUser, Users } from "lucide-react";
 import { DarkMode } from "../darkModeChange";
 import Cookies from "js-cookie";
 import { User } from "@/types";
+import Image from "next/image";
 
 const Header = () => {
   const pathname = usePathname();
@@ -29,7 +30,10 @@ const Header = () => {
         <SidebarTrigger />
         <div>
           <div className="flex items-center gap-2 ">
-            <p className="font-medium max-[500px]:text-sm max-[425px]:hidden"> Asosiy</p>
+            <p className="font-medium max-[500px]:text-sm max-[425px]:hidden">
+              {" "}
+              Asosiy
+            </p>
             <ChevronRight
               size={18}
               className={`${pathname == "/" && "hidden"} max-[425px]:hidden`}
@@ -58,10 +62,12 @@ const Header = () => {
             )}
           </div>
           {userInfo?.image ? (
-            <img
+            <Image
+              width={40}
+              height={40}
               src={userInfo.image}
-              className="size-10 rounded-full object-cover"
-              alt=""
+              className="!size-10 rounded-full object-cover"
+              alt="das"
             />
           ) : (
             <CircleUser size={35} className="!text-foreground" />

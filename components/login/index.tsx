@@ -42,7 +42,7 @@ const LoginComponents = () => {
       router.push("/");
       console.log(isSuccess);
     }
-  }, [isPending, isSuccess]);
+  }, [isPending, isSuccess, router]);
 
   return (
     <div className="h-screen  relative  w-full flex items-center justify-center bg-gradient-to-br from-background to-background px-4">

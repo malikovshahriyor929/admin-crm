@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEditProfileMutaion } from "@/request/mutation";
 import Cookies from "js-cookie";
+import { User } from "@/types";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -32,13 +33,11 @@ export interface EditProfileType {
   last_name: string;
   email: string;
 }
-const Profile_tools = ({
-  setUserInfo,
-  userInfo,
-}: {
+interface ProfileToolsProps {
   setUserInfo: any;
-  userInfo: any;
-}) => {
+  userInfo: Partial<User>;
+}
+const Profile_tools = ({ setUserInfo, userInfo }: ProfileToolsProps) => {
   const { mutate } = useEditProfileMutaion();
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -85,7 +84,7 @@ const Profile_tools = ({
         }}
         size="sm"
       >
-        O'zgartirish
+        O&apos;zgartirish
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Cookie from "js-cookie";
 import { Myaxios } from "../axios";
-import { User } from "@/types";
+import { TatilType, User } from "@/types";
 import { AddType } from "@/components/admins-table/admin-add";
 import { EditProfileType } from "@/components/profile-update";
 const notify = notificationApi();
@@ -93,6 +93,31 @@ export const useEditProfileMutaion = () => {
     },
     onSuccess() {
       notify("edit");
+    },
+  });
+};
+
+export const TatilCase = () => {
+  const queryClient = useQueryClient();
+  return (data: any) => {
+    return queryClient.setQueryData(["admins"], (old: User[]) => {
+      return old.map((value) =>
+        value._id === data._id ? { ...value, ...data } : value
+      );
+    });
+  };
+};
+
+export const useTatildaMutaion = () => {
+  const tatil = TatilCase();
+  return useMutation({
+    mutationKey: ["tatil"],
+    mutationFn: (data: TatilType) => {
+      tatil(data);
+      return Myaxios.post("/api/staff/leave-staff", data);
+    },
+    onSuccess() {
+      notify("chiq");
     },
   });
 };
