@@ -72,13 +72,10 @@ const Profile = () => {
       console.error("Error uploading:", error);
     }
   };
-//   const isBrowser = typeof window !== "undefined";
-// const formattedDate = isBrowser
-//   ? new Date(userInfo?.createdAt).toLocaleString("uz-UZ")
-//   : userInfo?.createdAt;
+
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 max-[320px]:p-0">
       <div className="bg-background shadow rounded-xl p-6 flex justify-between items-center max-[520px]:flex-col max-[520px]:items-start max-[380px]:items-center max-[520px]:gap-3 ">
         <div className="flex items-center gap-4 max-[380px]:flex-col ">
           <div className="relative cursor-pointer" onClick={handleAvatarClick}>

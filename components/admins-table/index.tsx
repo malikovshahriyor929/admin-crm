@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Search, X } from "lucide-react";
 import { User } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Myaxios } from "@/request/axios";
@@ -46,6 +46,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -58,17 +66,34 @@ const tatilSchema = z.object({
   reason: z.string().min(5),
 });
 
+type Params = {
+  status?: string;
+  search?: string;
+};
 const AdminsTableComponent = () => {
   const { mutate } = useEditMutation();
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState(false);
+  const [searchValue, setSearchValue] = useState<string>("");
   const [tatil, setTatil] = useState({ bool: false, id: "" });
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const deleteAdminCas = deleteAdminCase();
   const { mutate: tatilMutate } = useTatildaMutaion();
+  const params: Params = {};
+  if (selectedStatus !== "all") {
+    params.status = selectedStatus;
+  }
+  if (searchValue.trim() !== "") {
+    params.search = searchValue.trim();
+  }
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["admins"],
     queryFn: () =>
-      Myaxios.get("/api/staff/all-admins").then((res) => res.data.data),
+      Myaxios.get(
+        "/api/staff/all-admins",
+        Object.keys(params).length > 0 ? { params } : {}
+      ).then((res) => res.data.data),
   });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -133,13 +158,69 @@ const AdminsTableComponent = () => {
       refetch()
     );
   };
+
+  const handleSelectChange = (value: string) => {
+    setSelectedStatus(value);
+    console.log(value);
+  };
+  useEffect(() => {
+    refetch();
+  }, [selectedStatus]);
+
+  const SearchFn = (e: FormEvent) => {
+    e.preventDefault();
+    setSearch(false);
+    refetch();
+  };
+  useEffect(() => {
+    if (searchValue.trim() == "") {
+      refetch()
+    }
+  }, [searchValue]);
+
+
+
   return (
     <div className=" relative">
-      <div className="flex items-center justify-between  ">
-        <h2 className="text-xl font-semibold mb-4 max-[400px]:text-lg">
-          Aminlar ro&apos;yxati
+      <div className="flex items-center justify-between  gap-2 ">
+        <h2 className="text-xl font-semibold mb-4 max-[525px]:text-lg max-[385px]:text-[16px] max-[355px]:hidden truncate">
+          Adminlar ro&apos;yxati
         </h2>
-        <div>{user?.role == "manager" && <Admin_tools />}</div>
+        <div className="flex items-center gap-4 max-[470px]:gap-2 max-[460px]:  ">
+          {params.search?.length! > 0 && (
+            <Button size="sm" className="mb-4">
+              {searchValue !== "" && (
+                <p className="font-medium truncate max-w-[40px]  ">{searchValue}</p>
+              )}
+              <div
+                onClick={() => {
+                  setSearchValue("");
+                }}
+              >
+                <X />
+              </div>
+            </Button>
+          )}
+          <Button size="sm" className="mb-4" onClick={() => setSearch(!search)}>
+            <Search size={30} />
+          </Button>
+          {user?.role == "manager" && <Admin_tools />}
+          <div className="mb-4">
+            <Select onValueChange={handleSelectChange} value={selectedStatus}>
+              <SelectTrigger className="w-fit">
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="ta'tilda">Tatilda</SelectItem>
+                  {/* <SelectItem value="faol">Faol</SelectItem> */}
+                  <SelectItem value="ishdan bo'shatilgan">Nofaol</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
       <Table>
         <TableHeader className="">
@@ -185,6 +266,9 @@ const AdminsTableComponent = () => {
                             O&apos;chirish
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            className={`${
+                              user.status == "ishdan bo'shatilgan" && "hidden"
+                            } ${user.status == "ta'tilda" && "hidden"}`}
                             onClick={() =>
                               setTatil({ bool: true, id: user._id })
                             }
@@ -361,6 +445,22 @@ const AdminsTableComponent = () => {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+      {/* search */}
+      <Dialog open={search} onOpenChange={setSearch}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit profile</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={SearchFn} className="flex flex-col gap-5">
+            <Input
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              type="text"
+            />
+            <Button type="submit">Save changes</Button>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

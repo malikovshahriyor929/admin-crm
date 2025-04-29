@@ -14,12 +14,14 @@ const SideBar = () => {
   const router = useRouter();
   const notify = notificationApi();
   return (
-    <div className="w-[300px border-r border-foreground/40 h-full bg-background max-[350px]:">
+    <div className=" border-r border-foreground/40 h-full bg-background max-[350px]:">
       <div className="p-4 flex items-center justify-between">
         <h1 className=" font-bold">Admin CRM</h1>
         <SidebarTrigger className="hidden max-[400px]:flex" />
       </div>
-      <div className="p-4 h-[calc(100vh-3.5rem) overflow-y-scrol">
+      <div
+        className={`p-4 `}
+      >
         <h2 className="font-semibold  mb-4">Menu</h2>
         <ul className="space-y-2">
           {sidebarLinks.map((link: SidebarType) => (

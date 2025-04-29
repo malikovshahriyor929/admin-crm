@@ -29,7 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAddAdminMutaion } from "@/request/mutation";
-
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -76,9 +75,13 @@ const Admin_tools = () => {
   };
   return (
     <div className="flex items-center gap-4">
-      <Button className="mb-4" onClick={() => setOpen(!open)} size="sm">
-        <Plus className="max-[342px]:!flex" />
-        <p className="max-[342px]:hidden ">Admin Qo&apos;shish</p>
+      <Button
+        className="mb-4 flex items-center justify-center "
+        onClick={() => setOpen(!open)}
+        size="sm"
+      >
+        <Plus  />
+        <p className="max-[620px]:hidden">Admin Qo&apos;shish</p>
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
