@@ -25,10 +25,10 @@ const SideBar = () => {
         <h2 className="font-semibold  mb-4">Menu</h2>
         <ul className="space-y-2">
           {sidebarLinks.map((link: SidebarType) => (
-            <li key={link.name}>
+            <li key={link.name} className="cursor-pointer ">
               <Link
                 href={link.path}
-                className={`flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent  ${
+                className={`flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent cursor-pointer ${
                   pathname === link.path
                     ? "!border-foreground/40  "
                     : "hover:!border-foreground/70 "
@@ -43,10 +43,10 @@ const SideBar = () => {
         <h2 className="font-semibold  my-4">Boshqalar</h2>
         <ul className="space-y-2">
           {other_links.map((link: SidebarType) => (
-            <li key={link.name}>
+            <li key={link.name} className="cursor-pointer">
               <Link
                 href={link.path}
-                className={`flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent  ${
+                className={`flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent cursor-pointer ${
                   pathname === link.path
                     ? "!border-foreground/40  "
                     : "hover:!border-foreground/70 "
@@ -64,7 +64,7 @@ const SideBar = () => {
               Cookie.remove("user");
               notify("LogOut");
             }}
-            className={`flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent hover:!border-foreground/70`}
+            className={`flex items-center cursor-pointer gap-3 p-2 rounded-lg transition-all border border-transparent hover:!border-foreground/70`}
           >
             <LogOut />
             Chiqish
