@@ -161,11 +161,10 @@ const AdminsTableComponent = () => {
 
   const handleSelectChange = (value: string) => {
     setSelectedStatus(value);
-    console.log(value);
   };
   useEffect(() => {
     refetch();
-  }, [selectedStatus]);
+  }, [selectedStatus, refetch]);
 
   const SearchFn = (e: FormEvent) => {
     e.preventDefault();
@@ -173,12 +172,10 @@ const AdminsTableComponent = () => {
     refetch();
   };
   useEffect(() => {
-    if (searchValue.trim() == "") {
-      refetch()
+    if (searchValue.trim() === "") {
+      refetch();
     }
-  }, [searchValue]);
-
-
+  }, [searchValue, refetch]);
 
   return (
     <div className=" relative">
@@ -187,10 +184,12 @@ const AdminsTableComponent = () => {
           Adminlar ro&apos;yxati
         </h2>
         <div className="flex items-center gap-4 max-[470px]:gap-2 max-[460px]:  ">
-          {params.search?.length! > 0 && (
+          {(params.search?.length ?? 0) > 0 && (
             <Button size="sm" className="mb-4">
               {searchValue !== "" && (
-                <p className="font-medium truncate max-w-[40px]  ">{searchValue}</p>
+                <p className="font-medium truncate max-w-[40px]  ">
+                  {searchValue}
+                </p>
               )}
               <div
                 onClick={() => {

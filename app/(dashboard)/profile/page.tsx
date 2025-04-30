@@ -11,7 +11,7 @@ import Profile_tools from "@/components/profile-update";
 import Image from "next/image";
 
 const Profile = () => {
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<Partial<User>>({
     first_name: "",
     last_name: "",
     email: "",
@@ -73,7 +73,6 @@ const Profile = () => {
     }
   };
 
-
   return (
     <div className="p-6 space-y-6 max-[320px]:p-0">
       <div className="bg-background shadow rounded-xl p-6 flex justify-between items-center max-[520px]:flex-col max-[520px]:items-start max-[380px]:items-center max-[520px]:gap-3 ">
@@ -112,7 +111,7 @@ const Profile = () => {
               <Calendar size={16} />
               <p className="max-[800px]:text-sm">
                 Qo&apos;shilgan:
-                {new Date(userInfo.createdAt).toLocaleDateString("uz-UZ")}
+                {new Date(userInfo.createdAt!).toLocaleDateString("uz-UZ")}
               </p>
             </div>
           </div>

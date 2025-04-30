@@ -20,11 +20,11 @@ export interface User {
   token?: string;
   active?: boolean;
   is_deleted?: boolean;
-  createdAt?: string; // ISO date string
-  updatedAt?: string; // ISO date string
-  work_date?: string; // ISO date string
-  work_end?: string | null; // null or ISO date string
-  last_active_date?: string; // ISO date string
+  createdAt?: string | number | Date;
+  updatedAt?: string;
+  work_date?: string;
+  work_end?: string | null;
+  last_active_date?: string;
 }
 export interface TatilType {
   _id: string;

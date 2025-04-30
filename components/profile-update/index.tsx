@@ -41,7 +41,7 @@ export interface EditProfileType {
   email: string;
 }
 interface ProfileToolsProps {
-  setUserInfo: any;
+  setUserInfo: React.Dispatch<React.SetStateAction<Partial<User>>>;
   userInfo: Partial<User>;
 }
 const Profile_tools = ({ setUserInfo, userInfo }: ProfileToolsProps) => {
@@ -231,7 +231,6 @@ const Profile_tools = ({ setUserInfo, userInfo }: ProfileToolsProps) => {
               />
 
               <DialogFooter>
-                
                 {loading ? (
                   <Button>
                     <Loader className="animate-spin" />
