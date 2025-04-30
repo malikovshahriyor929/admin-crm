@@ -54,6 +54,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { toast } from "sonner";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -139,6 +140,7 @@ const AdminsTableComponent = () => {
       },
     }).then(() => {
       deleteAdminCas(data);
+      refetch();
     });
   };
   const tatilFn = (values: z.infer<typeof tatilSchema>) => {
@@ -176,7 +178,12 @@ const AdminsTableComponent = () => {
       refetch();
     }
   }, [searchValue, refetch]);
-
+  const Hiring = (id: string) => {
+    Myaxios.post("/api/staff/return-work-staff", { _id: id }).then(() => {
+      toast.success("Ishga qaytarishdingiz");
+      refetch();
+    });
+  };
   return (
     <div className=" relative">
       <div className="flex items-center justify-between  gap-2 ">
@@ -281,6 +288,14 @@ const AdminsTableComponent = () => {
                               Tatildan chiqrish
                             </DropdownMenuItem>
                           )}
+                          <DropdownMenuItem
+                            className={`${user.status == "faol" && "hidden"} ${
+                              user.status == "ta'tilda" && "hidden"
+                            }`}
+                            onClick={() => Hiring(user._id)}
+                          >
+                            Ishga qaytarish
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

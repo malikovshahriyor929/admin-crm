@@ -76,8 +76,8 @@ const Admin_tools = () => {
   return (
     <div className="flex items-center gap-4">
       <Button
-        className="mb-4 flex items-center justify-center "
         onClick={() => setOpen(!open)}
+        className="mb-4 flex items-center justify-center "
         size="sm"
       >
         <Plus  />
