@@ -8,15 +8,19 @@ export function DarkMode() {
   const [check, setCheck] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem("as");
-      setCheck(JSON.parse(saved as string)||false);
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("as");
+      setCheck(JSON.parse(saved as string) || false);
+    }
   }, []);
 
   const toggleTheme = () => {
     const newCheck = !check;
     setCheck(newCheck);
     setTheme(newCheck ? "light" : "dark");
-    localStorage.setItem("as", JSON.stringify(newCheck));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("as", JSON.stringify(newCheck));
+    }
   };
   return (
     <>
@@ -27,8 +31,10 @@ export function DarkMode() {
           onClick={() => {
             setTheme("light");
             setCheck(!check);
-            localStorage.setItem("as", JSON.stringify(!check));
-            toggleTheme()
+            if (typeof window !== "undefined") {
+              localStorage.setItem("as", JSON.stringify(!check));
+            }
+            toggleTheme();
           }}
           className={` ${!check ? "hidden" : "flex"}`}
         >
@@ -43,8 +49,10 @@ export function DarkMode() {
           onClick={() => {
             setTheme("dark");
             setCheck(!check);
-            localStorage.setItem("as", JSON.stringify(!check));
-            toggleTheme()
+            if (typeof window !== "undefined") {
+              localStorage.setItem("as", JSON.stringify(!check));
+            }
+            toggleTheme();
           }}
         >
           <Sun

@@ -17,7 +17,6 @@ export const useLoginMutation = () => {
         data: data,
       }),
     onSuccess(res) {
-      localStorage.setItem("sadad", JSON.stringify(res));
       Cookie.set("token", res.data.data.token);
       Cookie.set("user", JSON.stringify(res.data.data));
       notify("login");

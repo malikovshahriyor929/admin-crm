@@ -55,6 +55,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { toast } from "sonner";
+import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -77,6 +79,8 @@ const AdminsTableComponent = () => {
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [tatil, setTatil] = useState({ bool: false, id: "" });
+  const [info, setInfo] = useState<boolean>(false);
+  const [userinfo, setUserInfo] = useState<User>();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const deleteAdminCas = deleteAdminCase();
@@ -183,6 +187,14 @@ const AdminsTableComponent = () => {
       toast.success("Ishga qaytarishdingiz");
       refetch();
     });
+  };
+  const Info = ({ _id }: { _id: string }) => {
+    Myaxios.get(`/api/staff/info/${_id}`)
+      .then((res) => {
+        setUserInfo(res.data.data);
+        setInfo(true);
+      })
+      .catch(() => toast.error("Nimadur xato boshqatdan urinib koring!"));
   };
   return (
     <div className=" relative">
@@ -295,6 +307,13 @@ const AdminsTableComponent = () => {
                             onClick={() => Hiring(user._id)}
                           >
                             Ishga qaytarish
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              Info({ _id: user._id });
+                            }}
+                          >
+                            Info
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -476,6 +495,74 @@ const AdminsTableComponent = () => {
             <Button type="submit">Save changes</Button>
           </form>
         </DialogContent>
+      </Dialog>
+      {/* Info */}
+      <Dialog open={info} onOpenChange={setInfo}>
+        {userinfo?._id && (
+          <DialogContent className=" w-[600px]">
+            <Card className="w-full rounded-2xl bg-background border-none shadow-md ">
+              <CardHeader className="flex items-center gap-6">
+                <div
+                  className={`relative size-[120px] rounded-full overflow-hidden border-2 border-muted ${
+                    !userinfo.image && "px-10"
+                  }`}
+                >
+                  {userinfo.image ? (
+                    <Image
+                      src={userinfo.image}
+                      alt={`${userinfo.first_name} ${userinfo.last_name}`}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="size-[120px] flex items-center justify-center w-full h-full text-2xl">
+                      {userinfo.first_name[0] + userinfo.last_name[0]}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <CardTitle className="text-2xl font-semibold">
+                    {userinfo.first_name} {userinfo.last_name}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {userinfo.email}
+                  </p>
+                </div>
+              </CardHeader>
+              <CardContent className="mt- space-y-2">
+                <div className="flex flex-wrap gap-2">
+                  {userinfo.role && (
+                    <span className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800">
+                      Role: {userinfo.role}
+                    </span>
+                  )}
+                  {userinfo.status && (
+                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800">
+                      Status: {userinfo.status}
+                    </span>
+                  )}
+                </div>
+
+                <div className="text-sm text-muted-foreground space-y-1 pt-4">
+                  {userinfo.createdAt && (
+                    <p>
+                      Yartilgan vaqt:
+                      {new Date(userinfo.createdAt).toLocaleDateString()}
+                    </p>
+                  )}
+                  {userinfo.work_date && (
+                    <p>Ish boshlagan vaqt: {userinfo.work_date.slice(0, 10)}</p>
+                  )}
+                  {userinfo.work_end && (
+                    <p>
+                      Ishdan boshagan vaqt: {userinfo.work_end.slice(0, 10)}
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </DialogContent>
+        )}
       </Dialog>
     </div>
   );

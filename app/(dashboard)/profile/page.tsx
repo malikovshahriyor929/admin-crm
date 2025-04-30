@@ -89,7 +89,7 @@ const Profile = () => {
             ) : (
               <CircleUser size={80} className="text-foreground" />
             )}
-            <div className="absolute bottom-0 right-0  rounded-full p-1">
+            <div className="absolute bottom-0 -right-2  rounded-full p-1">
               <FaCamera size={16} />
             </div>
           </div>
