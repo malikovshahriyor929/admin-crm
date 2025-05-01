@@ -14,32 +14,9 @@ import { User } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Myaxios } from "@/request/axios";
 import { Skeleton } from "../ui/skeleton";
-import {
-  deleteAdminCase,
-  useEditMutation,
-  useTatildaMutaion,
-} from "@/request/mutation";
 import Cookies from "js-cookie";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogHeader,
-  DialogFooter,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogHeader } from "../ui/dialog";
 import { Input } from "../ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Admin_tools from "./admin-add";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,38 +31,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import Teacher_tools from "./teacher-add";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-const formSchema = z.object({
-  email: z.string().email("To‘g‘ri email kiriting").min(5),
-  last_name: z.string().min(5),
-  first_name: z.string().min(5),
-});
+// const formSchema = z.object({
+//   email: z.string().email("To‘g‘ri email kiriting").min(5),
+//   last_name: z.string().min(5),
+//   first_name: z.string().min(5),
+// });
 
-const tatilSchema = z.object({
-  start_date: z.string(),
-  end_date: z.string(),
-  reason: z.string().min(5),
-});
+// const tatilSchema = z.object({
+//   start_date: z.string(),
+//   end_date: z.string(),
+//   reason: z.string().min(5),
+// })
 type Params = {
   status?: string;
   search?: string;
 };
-const AdminsTableComponent = () => {
-  const { mutate } = useEditMutation();
+const TeachersTableComponent = () => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState<string>("");
-  const [tatil, setTatil] = useState({ bool: false, id: "" });
-  const [info, setInfo] = useState<boolean>(false);
-  const [userinfo, setUserInfo] = useState<User>();
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  //   const [tatil, setTatil] = useState({ bool: false, id: "" });
+  const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
-  const deleteAdminCas = deleteAdminCase();
-  const { mutate: tatilMutate } = useTatildaMutaion();
-  const userCookie = Cookies.get("user");
-  const user = userCookie ? JSON.parse(userCookie) : null;
   const params: Params = {};
   if (selectedStatus !== "all") {
     params.status = selectedStatus;
@@ -97,78 +67,45 @@ const AdminsTableComponent = () => {
     queryKey: ["admins"],
     queryFn: () =>
       Myaxios.get(
-        "/api/staff/all-admins",
+        "/api/teacher/get-all-teachers",
         Object.keys(params).length > 0 ? { params } : {}
       ).then((res) => res.data.data),
   });
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      last_name: "",
-      first_name: "",
-    },
-  });
-  const tatilForm = useForm<z.infer<typeof tatilSchema>>({
-    resolver: zodResolver(tatilSchema),
-    defaultValues: {
-      start_date: "",
-      end_date: "",
-      reason: "",
-    },
-  });
-  const editAdmin = (values: z.infer<typeof formSchema>) => {
-    mutate(
-      {
-        ...values,
-        _id: selectedUser?._id,
-        status: selectedUser?.status,
-      },
-      {
-        onSuccess(data) {
-          console.log(data);
-          setOpen(false);
-          form.reset();
-        },
-      }
-    );
-  };
-  const delteAdmin = (data: User) => {
-    Myaxios({
-      url: "/api/staff/deleted-admin",
-      data: { _id: data?._id },
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${Cookies.get("token")}`,
-      },
+  //   const form = useForm<z.infer<typeof formSchema>>({
+  //     resolver: zodResolver(formSchema),
+  //     defaultValues: {
+  //       email: "",
+  //       last_name: "",
+  //       first_name: "",
+  //     },
+  //   });
+  //   const tatilForm = useForm<z.infer<typeof tatilSchema>>({
+  //     resolver: zodResolver(tatilSchema),
+  //     defaultValues: {
+  //       start_date: "",
+  //       end_date: "",
+  //       reason: "",
+  //     },
+  //   });
+  const userCookie = Cookies.get("user");
+  const user = userCookie ? JSON.parse(userCookie) : null;
+  //   const editAdmin = () => {};
+  const delteAdmin = (id: string) => {
+    Myaxios.delete("/api/teacher/fire-teacher", {
+      data: { _id: id },
     }).then(() => {
-      deleteAdminCas(data);
+      toast.success("Siz Ustozni ishdan boshatdingiz!");
       refetch();
     });
   };
-  const tatilFn = (values: z.infer<typeof tatilSchema>) => {
-    tatilMutate(
-      { ...values, _id: tatil.id },
-      {
-        onSuccess() {
-          setTatil({ bool: false, id: "" });
-          tatilForm.reset();
-          refetch();
-        },
-      }
-    );
-  };
-  const tatildanChiqish = (id: string) => {
-    Myaxios.post("/api/staff/leave-exit-staff", { _id: id }).then(() =>
-      refetch()
-    );
-  };
+  //   const tatilFn = () => {};
   const handleSelectChange = (value: string) => {
     setSelectedStatus(value);
   };
   useEffect(() => {
     refetch();
   }, [selectedStatus, refetch]);
+
   const SearchFn = (e: FormEvent) => {
     e.preventDefault();
     setSearch(false);
@@ -179,25 +116,11 @@ const AdminsTableComponent = () => {
       refetch();
     }
   }, [searchValue, refetch]);
-  const Hiring = (id: string) => {
-    Myaxios.post("/api/staff/return-work-staff", { _id: id }).then(() => {
-      toast.success("Ishga qaytarishdingiz");
-      refetch();
-    });
-  };
-  const Info = ({ _id }: { _id: string }) => {
-    Myaxios.get(`/api/staff/info/${_id}`)
-      .then((res) => {
-        setUserInfo(res.data.data);
-        setInfo(true);
-      })
-      .catch(() => toast.error("Nimadur xato boshqatdan urinib koring!"));
-  };
   return (
     <div className=" relative">
       <div className="flex items-center justify-between  gap-2 ">
         <h2 className="text-xl font-semibold mb-4 max-[525px]:text-lg max-[385px]:text-[16px] max-[355px]:hidden truncate">
-          Adminlar ro&apos;yxati
+          Ustozlar ro&apos;yxati
         </h2>
         <div className="flex items-center gap-4 max-[470px]:gap-2 max-[460px]:  ">
           {(params.search?.length ?? 0) > 0 && (
@@ -219,7 +142,8 @@ const AdminsTableComponent = () => {
           <Button size="sm" className="mb-4" onClick={() => setSearch(!search)}>
             <Search size={30} />
           </Button>
-          {user?.role == "manager" && <Admin_tools />}
+          {user?.role == "manager" ||
+            (user?.role == "admin" && <Teacher_tools />)}
           <div className="mb-4">
             <Select onValueChange={handleSelectChange} value={selectedStatus}>
               <SelectTrigger className="w-fit">
@@ -229,7 +153,7 @@ const AdminsTableComponent = () => {
                 <SelectGroup>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="ta'tilda">Tatilda</SelectItem>
-                  {/* <SelectItem value="faol">Faol</SelectItem> */}
+                  <SelectItem value="faol">Faol</SelectItem>
                   <SelectItem value="ishdan bo'shatilgan">Nofaol</SelectItem>
                 </SelectGroup>
               </SelectContent>
@@ -238,7 +162,7 @@ const AdminsTableComponent = () => {
         </div>
       </div>
       <Table>
-        <TableHeader className="">
+        <TableHeader>
           <TableRow>
             <TableHead>Ism</TableHead>
             <TableHead>Familiya</TableHead>
@@ -267,33 +191,33 @@ const AdminsTableComponent = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedUser(user);
-                              form.setValue("email", user.email);
-                              form.setValue("last_name", user.last_name);
-                              form.setValue("first_name", user.first_name);
-                              setOpen(true);
-                            }}
+                          // onClick={() => {
+                          //   setSelectedUser(user);
+                          // //   form.setValue("email", user.email);
+                          // //   form.setValue("last_name", user.last_name);
+                          // //   form.setValue("first_name", user.first_name);
+                          //   setOpen(true);
+                          // }}
                           >
                             Tahrirlash
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => delteAdmin(user)}>
+                          <DropdownMenuItem
+                            onClick={() => delteAdmin(user._id)}
+                          >
                             O&apos;chirish
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className={`${
                               user.status == "ishdan bo'shatilgan" && "hidden"
                             } ${user.status == "ta'tilda" && "hidden"}`}
-                            onClick={() =>
-                              setTatil({ bool: true, id: user._id })
-                            }
+                            // onClick={() =>
+                            //   setTatil({ bool: true, id: user._id })
+                            // }
                           >
                             Ta&apos;tilga chiqarish
                           </DropdownMenuItem>
                           {user.status == "ta'tilda" && (
-                            <DropdownMenuItem
-                              onClick={() => tatildanChiqish(user._id)}
-                            >
+                            <DropdownMenuItem>
                               Tatildan chiqrish
                             </DropdownMenuItem>
                           )}
@@ -301,13 +225,12 @@ const AdminsTableComponent = () => {
                             className={`${user.status == "faol" && "hidden"} ${
                               user.status == "ta'tilda" && "hidden"
                             }`}
-                            onClick={() => Hiring(user._id)}
                           >
                             Ishga qaytarish
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              Info({ _id: user._id });
+                              router.push(`/teachers/${user._id}`);
                             }}
                           >
                             Info
@@ -355,7 +278,7 @@ const AdminsTableComponent = () => {
         </TableBody>
       </Table>
       {/* edit modal */}
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit admins</DialogTitle>
@@ -412,9 +335,10 @@ const AdminsTableComponent = () => {
             </form>
           </Form>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
+
       {/* tatil modal */}
-      <Dialog
+      {/* <Dialog
         open={tatil.bool}
         onOpenChange={() => setTatil({ bool: !tatil.bool, id: "" })}
       >
@@ -476,7 +400,8 @@ const AdminsTableComponent = () => {
             </form>
           </Form>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
+
       {/* search */}
       <Dialog open={search} onOpenChange={setSearch}>
         <DialogContent className="sm:max-w-[425px]">
@@ -493,75 +418,7 @@ const AdminsTableComponent = () => {
           </form>
         </DialogContent>
       </Dialog>
-      {/* Info */}
-      <Dialog open={info} onOpenChange={setInfo}>
-        {userinfo?._id && (
-          <DialogContent className=" w-[600px]">
-            <Card className="w-full rounded-2xl bg-background border-none shadow-md ">
-              <CardHeader className="flex items-center gap-6">
-                <div
-                  className={`relative size-[120px] rounded-full overflow-hidden border-2 border-muted ${
-                    !userinfo.image && "px-10"
-                  }`}
-                >
-                  {userinfo.image ? (
-                    <Image
-                      src={userinfo.image}
-                      alt={`${userinfo.first_name} ${userinfo.last_name}`}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="size-[120px] flex items-center justify-center w-full h-full text-2xl">
-                      {userinfo.first_name[0] + userinfo.last_name[0]}
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <CardTitle className="text-2xl font-semibold">
-                    {userinfo.first_name} {userinfo.last_name}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    {userinfo.email}
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="mt- space-y-2">
-                <div className="flex flex-wrap gap-2">
-                  {userinfo.role && (
-                    <span className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800">
-                      Role: {userinfo.role}
-                    </span>
-                  )}
-                  {userinfo.status && (
-                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800">
-                      Status: {userinfo.status}
-                    </span>
-                  )}
-                </div>
-
-                <div className="text-sm text-muted-foreground space-y-1 pt-4">
-                  {userinfo.createdAt && (
-                    <p>
-                      Yartilgan vaqt:
-                      {new Date(userinfo.createdAt).toLocaleDateString()}
-                    </p>
-                  )}
-                  {userinfo.work_date && (
-                    <p>Ish boshlagan vaqt: {userinfo.work_date.slice(0, 10)}</p>
-                  )}
-                  {userinfo.work_end && (
-                    <p>
-                      Ishdan boshagan vaqt: {userinfo.work_end.slice(0, 10)}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </DialogContent>
-        )}
-      </Dialog>
     </div>
   );
 };
-export default AdminsTableComponent;
+export default TeachersTableComponent;

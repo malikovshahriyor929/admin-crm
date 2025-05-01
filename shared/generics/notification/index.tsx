@@ -7,7 +7,8 @@ type notificationApi =
   | "add"
   | "edit"
   | "error_admin"
-  | "chiq";
+  | "chiq"
+  | "addTeacher";
 
 export const notificationApi = () => {
   const notify = (type: notificationApi) => {
@@ -26,6 +27,8 @@ export const notificationApi = () => {
         return toast.error("Siz adminsiz manager boshqaradi!");
       case "chiq":
         return toast.success("Siz tatilga chiqdingiz!");
+      case "addTeacher":
+        return toast.success("Muvoffaqiyatli Ustoz Qo'shdingiz!");
     }
   };
   return notify;

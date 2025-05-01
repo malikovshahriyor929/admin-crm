@@ -14,10 +14,10 @@ const Managers = async () => {
       Myaxios.get("/api/staff/all-managers").then((res) => res.data.data),
   });
  
-
+  const dehydratedState = dehydrate(queryClient);
   return (
     <div className="p-4  rounded-xl shadow-sm  py-5">
-      <HydrationBoundary state={dehydrate(queryClient)}>
+      <HydrationBoundary state={dehydratedState}>
         <TableComponent />
       </HydrationBoundary>
     </div>

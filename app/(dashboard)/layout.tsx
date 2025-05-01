@@ -9,7 +9,7 @@ import Header from "@/components/header";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight:["100","200","300","400","500","600","700","800","900",]
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -24,8 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className}  antialiased`} suppressHydrationWarning>
-        <MainProvider >
+      <body
+        className={`${inter.className}  antialiased`}
+        suppressHydrationWarning
+      >
+        <MainProvider>
           <SidebarProvider suppressHydrationWarning>
             <Sidebar>
               <SideBar />

@@ -6,6 +6,7 @@ import { Myaxios } from "../axios";
 import { TatilType, User } from "@/types";
 import { AddType } from "@/components/admins-table/admin-add";
 import { EditProfileType } from "@/components/profile-update";
+import { AddTeacherType } from "@/components/teachers-table/teacher-add";
 const notify = notificationApi();
 export const useLoginMutation = () => {
   return useMutation({
@@ -117,6 +118,31 @@ export const useTatildaMutaion = () => {
     },
     onSuccess() {
       notify("chiq");
+    },
+  });
+};
+
+export const AddTaecherCase = () => {
+  const queryClient = useQueryClient();
+  return (data: any) => {
+    return queryClient.setQueryData(["teacher"], (old: User[]) => {
+      return [...old, { ...data }];
+    });
+  };
+};
+export const useAddTeacherMutaion = () => {
+  const AddTeacherCas = AddTaecherCase();
+  return useMutation({
+    mutationKey: ["teacher"],
+    mutationFn: (data: AddTeacherType) => {
+      AddTeacherCas(data);
+      return Myaxios.post("/api/teacher/create-teacher", data).then((res) =>
+        console.log(res)
+      );
+    },
+    onSuccess(data) {
+      notify("addTeacher");
+      console.log(data);
     },
   });
 };

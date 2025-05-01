@@ -11,7 +11,6 @@ import Image from "next/image";
 const Header = () => {
   const pathname = usePathname();
   const [userInfo, setUserInfo] = useState<User | null>(null);
-
   useEffect(() => {
     const cookie = Cookies.get("user");
     if (cookie) {
@@ -31,7 +30,6 @@ const Header = () => {
         <div>
           <div className="flex items-center gap-2 ">
             <p className="font-medium max-[500px]:text-sm max-[425px]:hidden">
-              {" "}
               Asosiy
             </p>
             <ChevronRight
