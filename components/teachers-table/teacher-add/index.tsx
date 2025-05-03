@@ -22,6 +22,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAddTeacherMutaion } from "@/request/mutation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -66,6 +73,7 @@ const Teacher_tools = () => {
     //   console.log(res)
     // );
   };
+  // "Frontend dasturlash", "Backend dasturlash", "Rus tili", "Ingliz tili",
   return (
     <div className="flex items-center gap-4">
       <Button
@@ -140,6 +148,7 @@ const Teacher_tools = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="field"
@@ -148,13 +157,31 @@ const Teacher_tools = () => {
                     <FormLabel className="text-foreground">
                       Ustoz turi
                     </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Web dasturlash" {...field} />
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Ustoz yo'nalishini tanlang" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Frontend dasturlash">
+                          Frontend dasturlash
+                        </SelectItem>
+                        <SelectItem value="Backend dasturlash">
+                          Backend dasturlash
+                        </SelectItem>
+                        <SelectItem value="Rus tili">Rus tili</SelectItem>
+                        <SelectItem value="Ingliz tili">Ingliz tili</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="password"

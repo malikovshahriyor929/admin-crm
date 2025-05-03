@@ -1,12 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { SidebarTrigger } from "../ui/sidebar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChevronRight, CircleUser, Users } from "lucide-react";
 import { DarkMode } from "../darkModeChange";
 import Cookies from "js-cookie";
 import { User } from "@/types";
 import Image from "next/image";
+import Link from "next/link";
 
 const Header = () => {
   const pathname = usePathname();
@@ -22,21 +23,24 @@ const Header = () => {
       }
     }
   }, []);
+  const router = useRouter();
 
   return (
     <div className="p-3 border-b border-foreground/40 w-full flex items-center justify-between">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
         <div>
-          <div className="flex items-center gap-2 ">
-            <p className="font-medium max-[500px]:text-sm max-[425px]:hidden">
-              Asosiy
-            </p>
+          <div className="flex items-center gap-2 cursor-pointer ">
+            <Link href={"/"}>
+              <p className="font-medium max-[500px]:text-sm max-[425px]:hidden">
+                Asosiy
+              </p>
+            </Link>
             <ChevronRight
               size={18}
               className={`${pathname == "/" && "hidden"} max-[425px]:hidden`}
             />
-            <p className="max-[500px]:text-sm">
+            <p onClick={() => router.back()} className="max-[500px]:text-sm">
               {pathname == "/"
                 ? ""
                 : pathname.slice(1, 2).toUpperCase() + pathname.slice(2)}

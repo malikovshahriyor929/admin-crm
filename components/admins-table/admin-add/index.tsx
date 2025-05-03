@@ -86,7 +86,7 @@ const Admin_tools = () => {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit admins</DialogTitle>
+            <DialogTitle>Tahrirlash</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form

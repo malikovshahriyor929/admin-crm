@@ -32,3 +32,35 @@ export interface TatilType {
   end_date: string;
   reason: string;
 }
+
+export interface TeacherType {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  password: string;
+  image: string | null;
+  field: string;
+  salary: number;
+  status: string;
+  is_deleted: boolean;
+  groups: any[];
+  work_date: string;
+  work_end: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GroupType {
+  createdAt: string;
+  disable: boolean;
+  end_group: null;
+  is_deleted: boolean;
+  name: string;
+  started_group: string;
+  students: object[];
+  teacher: TeacherType;
+  updatedAt: string;
+  _id: string;
+}

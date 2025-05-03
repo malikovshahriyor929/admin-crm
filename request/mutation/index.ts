@@ -7,6 +7,7 @@ import { TatilType, User } from "@/types";
 import { AddType } from "@/components/admins-table/admin-add";
 import { EditProfileType } from "@/components/profile-update";
 import { AddTeacherType } from "@/components/teachers-table/teacher-add";
+import { AddGroupType } from "@/components/groups/group_add";
 const notify = notificationApi();
 export const useLoginMutation = () => {
   return useMutation({
@@ -18,8 +19,8 @@ export const useLoginMutation = () => {
         data: data,
       }),
     onSuccess(res) {
-      Cookie.set("token", res.data.data.token);
-      Cookie.set("user", JSON.stringify(res.data.data));
+      Cookie.set("token", res.data.data.token, { expires: 1 / 24 });
+      Cookie.set("user", JSON.stringify(res.data.data), { expires: 1 / 24 });
       notify("login");
     },
     onError() {
@@ -134,7 +135,7 @@ export const useAddTeacherMutaion = () => {
   const AddTeacherCas = AddTaecherCase();
   return useMutation({
     mutationKey: ["teacher"],
-    mutationFn: (data: AddTeacherType) => {
+    mutationFn: async (data: AddTeacherType) => {
       AddTeacherCas(data);
       return Myaxios.post("/api/teacher/create-teacher", data).then((res) =>
         console.log(res)
@@ -142,6 +143,28 @@ export const useAddTeacherMutaion = () => {
     },
     onSuccess(data) {
       notify("addTeacher");
+      console.log(data);
+    },
+  });
+};
+export const AddGroupCase = () => {
+  const queryClient = useQueryClient();
+  return (data: any) => {
+    return queryClient.setQueryData(["groups"], (old: User[]) => {
+      return [...old, { ...data }];
+    });
+  };
+};
+export const useAddGroupMutation = () => {
+  const AddGroupCas = AddGroupCase();
+  return useMutation({
+    mutationKey: ["groups"],
+    mutationFn: async (data: AddGroupType) => {
+      AddGroupCas(data);
+      return Myaxios.post("/api/group/create-group", data);
+    },
+    onSuccess(data) {
+      notify("addGroup");
       console.log(data);
     },
   });

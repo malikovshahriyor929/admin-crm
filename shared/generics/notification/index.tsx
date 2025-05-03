@@ -8,7 +8,8 @@ type notificationApi =
   | "edit"
   | "error_admin"
   | "chiq"
-  | "addTeacher";
+  | "addTeacher"
+  | "addGroup";
 
 export const notificationApi = () => {
   const notify = (type: notificationApi) => {
@@ -29,6 +30,8 @@ export const notificationApi = () => {
         return toast.success("Siz tatilga chiqdingiz!");
       case "addTeacher":
         return toast.success("Muvoffaqiyatli Ustoz Qo'shdingiz!");
+      case "addGroup":
+        return toast.success("Muvoffaqiyatli Guruh Qo'shdingiz!");
     }
   };
   return notify;

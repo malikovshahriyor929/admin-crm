@@ -50,7 +50,7 @@ type Params = {
   search?: string;
 };
 const TeachersTableComponent = () => {
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState<string>("");
   //   const [tatil, setTatil] = useState({ bool: false, id: "" });
@@ -65,11 +65,18 @@ const TeachersTableComponent = () => {
   }
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["admins"],
-    queryFn: () =>
-      Myaxios.get(
+    queryFn: async () => {
+      const res = await Myaxios.get(
         "/api/teacher/get-all-teachers",
         Object.keys(params).length > 0 ? { params } : {}
-      ).then((res) => res.data.data),
+      );
+      const teachers = res.data.data;
+      return Array.isArray(teachers) ? teachers : [];
+    },
+    // Myaxios.get(
+    //   "/api/teacher/get-all-teachers",
+    //   Object.keys(params).length > 0 ? { params } : {}
+    // ).then((res) => res.data.data),
   });
   //   const form = useForm<z.infer<typeof formSchema>>({
   //     resolver: zodResolver(formSchema),
@@ -96,6 +103,12 @@ const TeachersTableComponent = () => {
     }).then(() => {
       toast.success("Siz Ustozni ishdan boshatdingiz!");
       refetch();
+    });
+  };
+  const hiring = (id: string) => {
+    Myaxios.post("api/teacher/return-teacher", { _id: id }).then((res) => {
+      refetch();
+      console.log(res.data);
     });
   };
   //   const tatilFn = () => {};
@@ -142,8 +155,7 @@ const TeachersTableComponent = () => {
           <Button size="sm" className="mb-4" onClick={() => setSearch(!search)}>
             <Search size={30} />
           </Button>
-          {user?.role == "manager" ||
-            (user?.role == "admin" && <Teacher_tools />)}
+          {(user?.role == "manager" || "admin") && <Teacher_tools />}
           <div className="mb-4">
             <Select onValueChange={handleSelectChange} value={selectedStatus}>
               <SelectTrigger className="w-fit">
@@ -167,78 +179,72 @@ const TeachersTableComponent = () => {
             <TableHead>Ism</TableHead>
             <TableHead>Familiya</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Rol</TableHead>
             <TableHead>Holat</TableHead>
             <TableHead className="text-center">Amallar</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {!isLoading || isError
+          {!isLoading && !isError && data
             ? data?.map((user: User, idx: number) => (
-                <TableRow key={user._id ? user._id : idx}>
-                  <Dialog open={open} onOpenChange={setOpen}>
-                    <TableCell>{user.first_name}</TableCell>
-                    <TableCell>{user.last_name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell className="capitalize">{user.role}</TableCell>
-                    <TableCell>{user.status}</TableCell>
-                    <TableCell className="text-right space-x-2 flex justify-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild className="">
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                          // onClick={() => {
-                          //   setSelectedUser(user);
-                          // //   form.setValue("email", user.email);
-                          // //   form.setValue("last_name", user.last_name);
-                          // //   form.setValue("first_name", user.first_name);
-                          //   setOpen(true);
-                          // }}
-                          >
-                            Tahrirlash
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => delteAdmin(user._id)}
-                          >
-                            O&apos;chirish
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className={`${
-                              user.status == "ishdan bo'shatilgan" && "hidden"
-                            } ${user.status == "ta'tilda" && "hidden"}`}
-                            // onClick={() =>
-                            //   setTatil({ bool: true, id: user._id })
-                            // }
-                          >
-                            Ta&apos;tilga chiqarish
-                          </DropdownMenuItem>
-                          {user.status == "ta'tilda" && (
-                            <DropdownMenuItem>
-                              Tatildan chiqrish
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            className={`${user.status == "faol" && "hidden"} ${
-                              user.status == "ta'tilda" && "hidden"
-                            }`}
-                          >
-                            Ishga qaytarish
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              router.push(`/teachers/${user._id}`);
-                            }}
-                          >
-                            Info
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </Dialog>
+                <TableRow key={user?._id ? user._id : idx}>
+                  <TableCell>{user.first_name}</TableCell>
+                  <TableCell>{user.last_name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  {/* <TableCell className="capitalize">{user.role}</TableCell> */}
+                  <TableCell>{user.status}</TableCell>
+                  <TableCell className="text-right space-x-2 flex justify-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild className="">
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {/* <DropdownMenuItem
+                        // onClick={() => {
+                        //   setSelectedUser(user);
+                        // //   form.setValue("email", user.email);
+                        // //   form.setValue("last_name", user.last_name);
+                        // //   form.setValue("first_name", user.first_name);
+                        //   setOpen(true);
+                        // }}
+                        >
+                          Tahrirlash
+                        </DropdownMenuItem> */}
+                        <DropdownMenuItem onClick={() => delteAdmin(user._id)}>
+                          O&apos;chirish
+                        </DropdownMenuItem>
+                        {/* <DropdownMenuItem
+                          className={`${
+                            user.status == "ishdan bo'shatilgan" && "hidden"
+                          } ${user.status == "ta'tilda" && "hidden"}`}
+                          // onClick={() =>
+                          //   setTatil({ bool: true, id: user._id })
+                          // }
+                        >
+                          Ta&apos;tilga chiqarish
+                        </DropdownMenuItem> */}
+                        {user.status == "ta'tilda" && (
+                          <DropdownMenuItem>Tatildan chiqrish</DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className={`${user.status == "faol" && "hidden"} ${
+                            user.status == "ta'tilda" && "hidden"
+                          }`}
+                          onClick={() => hiring(user._id)}
+                        >
+                          Ishga qaytarish
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            router.push(`/teachers/${user._id}`);
+                          }}
+                        >
+                          Info
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))
             : Array(10)

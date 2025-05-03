@@ -3,7 +3,7 @@ import { SidebarType } from "@/types";
 import { other_links, sidebarLinks } from "@/utils";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 import { LogOut } from "lucide-react";
 import Cookie from "js-cookie";
 import { notificationApi } from "@/shared/generics/notification";
@@ -13,6 +13,13 @@ const SideBar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const notify = notificationApi();
+
+  useEffect(() => {
+    const token = Cookie.get("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
   return (
     <div className=" border-r border-foreground/40 h-full bg-background max-[350px]:">
       <div className="p-4 flex items-center justify-between">
