@@ -1,7 +1,7 @@
 "use client";
 import { Myaxios } from "@/request/axios";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { GroupType } from "@/types";
+import { deleteGroupType, EditGroupType, GroupType } from "@/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,13 +21,65 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import Group_add_tool from "./group_add";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogHeader,
+  DialogFooter,
+} from "../ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "../ui/input";
+import { useEditGroupMutation } from "@/request/mutation";
+const formSchema = z.object({
+  date: z.string(),
+});
 
 const GroupComponents = () => {
-  const { data, isLoading, isError } = useQuery({
+  const [openEdit, setOpenEdit] = useState(false);
+  const [groupDetailsForEdit, setGroupDetailsForEdit] = useState<GroupType>();
+  const { mutate } = useEditGroupMutation();
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["groups"],
     queryFn: () =>
       Myaxios.get("/api/group/get-all-group").then((res) => res.data.data),
   });
+  const deleteGroup = ({ _id }: deleteGroupType) => {
+    Myaxios.delete("/api/group/end-group", { data: { _id } }).then(() =>
+      refetch()
+    );
+  };
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      date: "",
+    },
+  });
+  const editGroup = (values: z.infer<typeof formSchema>) => {
+    const value: EditGroupType = {
+      ...values,
+      _id: groupDetailsForEdit?._id as string,
+    };
+    mutate(value, {
+      onSuccess() {
+        refetch();
+        setOpenEdit(false);
+        form.reset();
+      },
+    });
+  };
+  console.log(data);
+
   return (
     <div>
       <div>
@@ -118,43 +170,30 @@ const GroupComponents = () => {
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              // setSelectedUser(user);
-                              // form.setValue("email", user.email);
-                              // form.setValue("last_name", user.last_name);
-                              // form.setValue("first_name", user.first_name);
-                              // setOpen(true);
-                            }}
-                          >
-                            Tahrirlash
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {}}>
-                            O&apos;chirish
-                          </DropdownMenuItem>
-                          {/* {user.status == "ta'tilda" && (
+                        <DropdownMenuContent align="end" >
+                          {!group.end_group == null && (
                             <DropdownMenuItem
-                              onClick={() => tatildanChiqish(user._id)}
+                              onClick={() => {
+                                setOpenEdit(true);
+                                form.setValue(
+                                  "date",
+                                  group.started_group.slice(0, 10)
+                                );
+                                setGroupDetailsForEdit(group);
+                              }}
                             >
-                              Tatildan chiqrish
+                              Tugash vaqtini belgilash
                             </DropdownMenuItem>
-                          )} */}
-                          {/* <DropdownMenuItem
-                            className={`${user.status == "faol" && "hidden"} ${
-                              user.status == "ta'tilda" && "hidden"
-                            }`}
-                            onClick={() => Hiring(user._id)}
-                          >
-                            Ishga qaytarish
-                          </DropdownMenuItem> */}
-                          <DropdownMenuItem
-                            onClick={() => {
-                              // Info({ _id: user._id });
-                            }}
-                          >
-                            Info
-                          </DropdownMenuItem>
+                          )}
+                          {!group.end_group == null && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                deleteGroup({ _id: group._id });
+                              }}
+                            >
+                              Guruhni tugatish
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -200,6 +239,36 @@ const GroupComponents = () => {
           </TableBody>
         </Table>
       </div>
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit admins</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(editGroup)}
+              className="grid gap-4 py-4"
+            >
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-foreground">Sana</FormLabel>
+                    <FormControl>
+                      <Input placeholder="2025-05-05" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

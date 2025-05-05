@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Cookie from "js-cookie";
 import { Myaxios } from "../axios";
-import { TatilType, User } from "@/types";
+import { EditGroupType, studentMutationType, TatilType, User } from "@/types";
 import { AddType } from "@/components/admins-table/admin-add";
 import { EditProfileType } from "@/components/profile-update";
 import { AddTeacherType } from "@/components/teachers-table/teacher-add";
@@ -135,12 +135,10 @@ export const useAddTeacherMutaion = () => {
   const AddTeacherCas = AddTaecherCase();
   return useMutation({
     mutationKey: ["teacher"],
-    mutationFn: async (data: AddTeacherType) => {
-      AddTeacherCas(data);
-      return Myaxios.post("/api/teacher/create-teacher", data).then((res) =>
-        console.log(res)
-      );
-    },
+    mutationFn: async (data: AddTeacherType) =>
+      Myaxios.post("/api/teacher/create-teacher", data).then((res) =>
+        AddTeacherCas(data)
+      ),
     onSuccess(data) {
       notify("addTeacher");
       console.log(data);
@@ -160,12 +158,47 @@ export const useAddGroupMutation = () => {
   return useMutation({
     mutationKey: ["groups"],
     mutationFn: async (data: AddGroupType) => {
-      AddGroupCas(data);
-      return Myaxios.post("/api/group/create-group", data);
+      return Myaxios.post("/api/group/create-group", data).then((res) =>
+        AddGroupCas(data)
+      );
     },
     onSuccess(data) {
       notify("addGroup");
       console.log(data);
+    },
+  });
+};
+// strudent
+export const useEditGroupMutation = () => {
+  return useMutation({
+    mutationFn: (data: EditGroupType) =>
+      Myaxios.put("/api/group/edit-end-group", data),
+    onSuccess() {
+      notify("editGroup");
+    },
+  });
+};
+
+export const AddStudentCase = () => {
+  const queryClient = useQueryClient();
+  return (data: any) => {
+    return queryClient.setQueryData(["students"], (old: User[]) => {
+      return [...old, { ...data }];
+    });
+  };
+};
+
+export const useAddStrudentMutation = () => {
+  const AddGroupCas = AddStudentCase();
+  return useMutation({
+    mutationKey: ["students"],
+    mutationFn: async (data: studentMutationType) =>
+      Myaxios.post("/api/student/create-student", data).then((res) => {
+        AddGroupCas(data);
+        console.log(res);
+      }),
+    onSuccess() {
+      notify("addStundent");
     },
   });
 };

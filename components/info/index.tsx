@@ -20,7 +20,7 @@ const InfoComponents = ({ id }: Id) => {
         (res: { data: { data: TeacherType } }) => res.data.data
       ),
   });
-  console.log(data);
+  // console.log(data);
   // useEffect(() => {
   //   if (!Object(data)) {
   //     console.error("Expected data to be an array, got:", data);

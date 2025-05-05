@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogFooter,
 } from "../../ui/dialog";
-import { Info, Loader, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -24,8 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Myaxios } from "@/request/axios";
 import useDebounce from "@/shared/generics/debounse";
 import { useQuery } from "@tanstack/react-query";
-import { TeacherType } from "@/types";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -34,29 +32,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAddGroupMutation } from "@/request/mutation";
+import { useAddStrudentMutation } from "@/request/mutation";
+import { GroupType } from "@/types";
+import { Params } from "next/dist/server/request/params";
 const formSchema = z.object({
-  name: z
+  first_name: z.string().min(5),
+  last_name: z.string(),
+  phone: z
     .string()
-    .min(5)
-    .regex(/N\d+$/, { message: "'N' bilan raqam bolishi kerak!" }),
-  teacher: z.string(),
-  started_group: z.string(),
+    .startsWith("+", { message: "iltimos O'zbek raqamidan kirning" }),
+  groups: z.array(
+    z.object({
+      group: z.string(),
+    })
+  ),
 });
-export interface AddGroupType {
-  name: string;
-  teacher: string;
-  started_group: string;
+export interface AddStudentType {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  groups: [
+    {
+      group: string;
+    }
+  ];
 }
-interface teacherIdType {
+interface GroupStudentType {
   name: string;
   id: string;
 }
-const Group_add_tool = () => {
-  const { mutate } = useAddGroupMutation();
+const Student_tools = () => {
+  const { mutate } = useAddStrudentMutation();
   const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const [teacherId, setTeacherId] = useState<teacherIdType>({
+//   const router = useRouter();
+  const [group, setGroup] = useState<GroupStudentType>({
     name: "",
     id: "",
   });
@@ -64,43 +73,50 @@ const Group_add_tool = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      teacher: "",
-      started_group: "",
+      first_name: "",
+      last_name: "",
+      phone: "",
+      groups: [{ group: "" }],
     },
   });
-
-  const addAdmin = (values: z.infer<typeof formSchema>) => {
+  const debounce = useDebounce<string>(searchValue, 500);
+  const params: Params = {};
+  if (debounce.trim() !== "") {
+    params.name = searchValue;
+  }
+  const addStundent = (values: z.infer<typeof formSchema>) => {
     mutate(
-      { ...values, teacher: teacherId.id },
+      { ...values, groups: [{ group: group.id }] },
       {
         onSuccess() {
-          setOpen(false);
-          form.reset();
-          setTeacherId({
+          setGroup({
             name: "",
             id: "",
           });
+          form.reset();
           setSearchValue("");
+          setOpen(false);
         },
       }
     );
+    setGroup({
+      name: "",
+      id: "",
+    });
+    form.reset();
+    setOpen(false);
   };
 
-  const debounce = useDebounce<string>(searchValue, 500);
-
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["search-teacher"],
-    queryFn: () =>
-      Myaxios.get("/api/group/search-teacher", { params: { name: debounce } }),
-    enabled: debounce.trim() !== "",
+    queryKey: ["search-guruh"],
+    queryFn: () => Myaxios.get("/api/student/search-group", { params }),
+    enabled: Object.keys(params).length > 0,
   });
   useEffect(() => {
-    if (debounce.trim() !== "") {
+    if (debounce.trim() !== "" || searchValue.trim() !== "") {
       refetch();
     }
-  }, [debounce, refetch]);
-
+  }, [debounce, refetch, searchValue]);
   return (
     <div className="flex items-center gap-4">
       <Button
@@ -109,34 +125,30 @@ const Group_add_tool = () => {
         size="sm"
       >
         <Plus />
-        <p className="max-[620px]:hidden">Guruh Qo&apos;shish</p>
+        <p className="max-[620px]:hidden">Student Qo&apos;shish</p>
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           className={`min-w-[600px] ${data && "min-h-[400px] !pb-20"} ${
-            teacherId.id && "min-h-[200px] !pb-0"
-          } ${
-            !data?.data?.data?.length && " !pb-0"
-          } max-[649px]:!min-w-[10px] `}
+            group.id && "min-h-[200px] !pb-0"
+          } ${!data?.data?.data?.length && " !pb-0"} max-[649px]:!min-w-[10px] `}
         >
           <DialogHeader>
             <DialogTitle>Tahrirlash</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(addAdmin)}
+              onSubmit={form.handleSubmit(addStundent)}
               className="grid gap-5 py-4 items-start "
             >
               <FormField
                 control={form.control}
-                name="name"
+                name="first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground">
-                      Guruh nomi
-                    </FormLabel>
+                    <FormLabel className="text-foreground">Ism</FormLabel>
                     <FormControl>
-                      <Input placeholder="Frontend dasturlash N1" {...field} />
+                      <Input placeholder="Davron" {...field} />
                     </FormControl>
                     <FormMessage className="text-red-500" />
                   </FormItem>
@@ -144,29 +156,41 @@ const Group_add_tool = () => {
               />
               <FormField
                 control={form.control}
-                name="teacher"
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-foreground">Famiyla</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Raimjonov" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="groups"
                 render={({ field }) => (
                   <FormItem className="relative ">
-                    <FormLabel className="text-foreground">Ustoz</FormLabel>
+                    <FormLabel className="text-foreground">Guruh</FormLabel>
                     <FormControl>
                       <div>
-                        {teacherId.id ? (
+                        {group.id ? (
                           <div className="flex items-center justify-between">
                             <Input
                               className="w-[93%]"
                               readOnly
-                              value={teacherId.name}
+                              value={group.name}
                             />
-                            <X
-                              onClick={() => setTeacherId({ name: "", id: "" })}
-                            />
+                            <X onClick={() => setGroup({ name: "", id: "" })} />
                           </div>
                         ) : (
                           <div>
                             <Input
                               {...field}
                               value={searchValue}
-                              placeholder="Davron"
+                              placeholder="Frontend N1"
                               onChange={(e) => setSearchValue(e.target.value)}
                             />
                             {data?.data?.data?.length && (
@@ -174,7 +198,7 @@ const Group_add_tool = () => {
                                 className={`absolute  overflow-y-auto h-[200px] top-17 rounded-xl p-2 flex flex-col gap-3  border border-accent-foreground/40 bg-[#161514] w-full  ${
                                   !data?.data?.data?.length &&
                                   "!h-[140px] !pb-0"
-                                }  `}
+                                } ${debounce.trim() == "" && "hidden"} `}
                               >
                                 <Table>
                                   <TableHeader>
@@ -182,48 +206,48 @@ const Group_add_tool = () => {
                                       <TableHead className="w-[30px]">
                                         No
                                       </TableHead>
-                                      <TableHead>Ism</TableHead>
-                                      <TableHead>Sohasi</TableHead>
+                                      <TableHead>Guruh</TableHead>
+                                      <TableHead>Ustoz</TableHead>
                                       <TableHead>Haqida</TableHead>
                                     </TableRow>
                                   </TableHeader>
                                   <TableBody>
                                     {!isLoading || !isError
                                       ? data?.data?.data?.map(
-                                          (
-                                            teacher: TeacherType,
-                                            idx: number
-                                          ) => (
+                                          (value: GroupType, idx: number) => (
                                             <TableRow
-                                              key={teacher._id}
-                                              onClick={() =>
-                                                setTeacherId({
-                                                  id: teacher._id,
-                                                  name: teacher.first_name,
-                                                })
-                                              }
+                                              key={value._id}
+                                              onClick={() => {
+                                                setGroup({
+                                                  id: value._id,
+                                                  name: value.name,
+                                                });
+                                                // form.setValue("groups", [
+                                                //   { group: value._id },
+                                                // ]);
+                                              }}
                                             >
                                               <TableCell className="text-center">
                                                 {idx + 1}
                                               </TableCell>
-                                              <TableCell className="pl-2 font-medium">
-                                                {teacher.first_name +
-                                                  " " +
-                                                  teacher.last_name}
+                                              <TableCell className="font-medium">
+                                                {value.name}
                                               </TableCell>
                                               <TableCell>
-                                                {teacher.field}
+                                                {value.teacher.first_name +
+                                                  " " +
+                                                  value.teacher.last_name}
                                               </TableCell>
-                                              <TableCell
-                                                onClick={() =>
-                                                  router.push(
-                                                    `teachers/${teacher._id}`
-                                                  )
-                                                }
+                                              {/* <TableCell
+                                                // onClick={() =>
+                                                //   router.push(
+                                                //     `teachers/${teacher._id}`
+                                                //   )
+                                                // }
                                                 className="pr-3"
                                               >
                                                 <Info />
-                                              </TableCell>
+                                              </TableCell> */}
                                             </TableRow>
                                           )
                                         )
@@ -242,25 +266,21 @@ const Group_add_tool = () => {
               />
               <FormField
                 control={form.control}
-                name="started_group"
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground">Email</FormLabel>
+                    <FormLabel className="text-foreground">
+                      Telefon raqam
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="2025-05-15" {...field} />
+                      <Input placeholder="+998900000000" {...field} />
                     </FormControl>
                     <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button  type="submit">
-                  {isLoading ? (
-                    <Loader className="animate-spin " />
-                  ) : (
-                    "Save changes"
-                  )}
-                </Button>
+                <Button type="submit">Save changes</Button>
               </DialogFooter>
             </form>
           </Form>
@@ -270,4 +290,4 @@ const Group_add_tool = () => {
   );
 };
 
-export default Group_add_tool;
+export default Student_tools;

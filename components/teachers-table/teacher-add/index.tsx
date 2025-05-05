@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "../../ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -49,7 +49,7 @@ export interface AddTeacherType {
   field: string;
 }
 const Teacher_tools = () => {
-  const { mutate } = useAddTeacherMutaion();
+  const { mutate,isPending } = useAddTeacherMutaion();
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,17 +63,15 @@ const Teacher_tools = () => {
     },
   });
   const addAdmin = (values: z.infer<typeof formSchema>) => {
+    console.log(values)
+    
     mutate(values, {
       onSuccess() {
-        setOpen(false);
         form.reset();
+        setOpen(false);
       },
     });
-    // Myaxios.post("/api/teacher/create-teacher", values).then((res) =>
-    //   console.log(res)
-    // );
   };
-  // "Frontend dasturlash", "Backend dasturlash", "Rus tili", "Ingliz tili",
   return (
     <div className="flex items-center gap-4">
       <Button
@@ -196,7 +194,13 @@ const Teacher_tools = () => {
                 )}
               />
               <DialogFooter>
-                <Button type="submit">Save changes</Button>
+                <Button type="submit">
+                  {isPending ? (
+                    <Loader className="animate-spin " />
+                  ) : (
+                    "Save changes"
+                  )}
+                </Button>
               </DialogFooter>
             </form>
           </Form>
