@@ -8,6 +8,7 @@ import { AddType } from "@/components/admins-table/admin-add";
 import { EditProfileType } from "@/components/profile-update";
 import { AddTeacherType } from "@/components/teachers-table/teacher-add";
 import { AddGroupType } from "@/components/groups/group_add";
+import { toast } from "sonner";
 const notify = notificationApi();
 export const useLoginMutation = () => {
   return useMutation({
@@ -75,9 +76,9 @@ export const useAddAdminMutaion = () => {
   const AddAdminCas = AddAdminCase();
   return useMutation({
     mutationKey: ["addFn"],
-    mutationFn: (data: AddType) => {
+    mutationFn: async (data: AddType) => {
       AddAdminCas(data);
-      return Myaxios.post("/api/staff/create-admin", data);
+      return await Myaxios.post("/api/staff/create-admin", data);
     },
     onSuccess(data) {
       notify("add");
@@ -199,6 +200,33 @@ export const useAddStrudentMutation = () => {
       }),
     onSuccess() {
       notify("addStundent");
+    },
+  });
+};
+
+export const useDeleteStrudentMutation = () => {
+  const AddGroupCas = AddStudentCase();
+  return useMutation({
+    mutationKey: ["students"],
+    mutationFn: async (data: { _id: string }) =>
+      Myaxios.delete("/api/student/delete-student", { data }).then((res) => {
+        AddGroupCas(data);
+      }),
+    onSuccess() {
+      notify("deleteStundent");
+    },
+  });
+};
+
+export const useAddStrudentGroupMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["students"],
+    mutationFn: async (data: any) =>
+      await Myaxios.post("/api/student/added-new-group-student", data),
+    onSuccess(data) {
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast.success(data.data.message);
     },
   });
 };

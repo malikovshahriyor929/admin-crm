@@ -252,7 +252,6 @@ const AdminsTableComponent = () => {
           {!isLoading || isError
             ? data?.map((user: User, idx: number) => (
                 <TableRow key={user._id ? user._id : idx}>
-                  <Dialog open={open} onOpenChange={setOpen}>
                     <TableCell>{user.first_name}</TableCell>
                     <TableCell>{user.last_name}</TableCell>
                     <TableCell>{user.email}</TableCell>
@@ -315,7 +314,6 @@ const AdminsTableComponent = () => {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
-                  </Dialog>
                 </TableRow>
               ))
             : Array(10)

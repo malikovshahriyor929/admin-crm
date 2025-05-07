@@ -12,6 +12,7 @@ import Link from "next/link";
 const Header = () => {
   const pathname = usePathname();
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const router = useRouter();
   useEffect(() => {
     const cookie = Cookies.get("user");
     if (cookie) {
@@ -23,8 +24,15 @@ const Header = () => {
       }
     }
   }, []);
-  const router = useRouter();
-
+  function path() {
+    const paths = pathname.slice(2);
+    let res = "";
+    for (let i = 0; i < paths.length; i++) {
+      if (paths[i] == "/") break;
+      res += paths[i];
+    }
+    return res;
+  }
   return (
     <div className="p-3 border-b border-foreground/40 w-full flex items-center justify-between">
       <div className="flex items-center gap-4">
@@ -43,7 +51,7 @@ const Header = () => {
             <p onClick={() => router.back()} className="max-[500px]:text-sm">
               {pathname == "/"
                 ? ""
-                : pathname.slice(1, 2).toUpperCase() + pathname.slice(2)}
+                : pathname.slice(1, 2).toUpperCase() + path()}
             </p>
           </div>
         </div>

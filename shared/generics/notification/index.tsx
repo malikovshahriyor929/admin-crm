@@ -11,6 +11,7 @@ type notificationApi =
   | "addTeacher"
   | "editGroup"
   | "addStundent"
+  | "deleteStundent"
   | "addGroup";
 
 export const notificationApi = () => {
@@ -38,6 +39,8 @@ export const notificationApi = () => {
         return toast.success("Muvoffaqiyatli O'quvchi Qo'shdingiz!");
       case "editGroup":
         return toast.success("Muvoffaqiyatli Guruhni O'zgartingiz!");
+      case "deleteStundent":
+        return toast.success("Muvoffaqiyatli o'quvchini o'chirdingiz!");
     }
   };
   return notify;
