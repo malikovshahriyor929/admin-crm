@@ -49,7 +49,7 @@ export interface AddTeacherType {
   field: string;
 }
 const Teacher_tools = () => {
-  const { mutate,isPending } = useAddTeacherMutaion();
+  const { mutate, isPending } = useAddTeacherMutaion();
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,14 +63,14 @@ const Teacher_tools = () => {
     },
   });
   const addAdmin = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
-    
     mutate(values, {
       onSuccess() {
         form.reset();
         setOpen(false);
       },
     });
+    form.reset();
+    setOpen(false);
   };
   return (
     <div className="flex items-center gap-4">

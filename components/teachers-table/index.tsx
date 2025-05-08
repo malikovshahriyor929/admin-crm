@@ -34,17 +34,6 @@ import {
 import Teacher_tools from "./teacher-add";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-// const formSchema = z.object({
-//   email: z.string().email("To‘g‘ri email kiriting").min(5),
-//   last_name: z.string().min(5),
-//   first_name: z.string().min(5),
-// });
-
-// const tatilSchema = z.object({
-//   start_date: z.string(),
-//   end_date: z.string(),
-//   reason: z.string().min(5),
-// })
 type Params = {
   status?: string;
   search?: string;
@@ -64,7 +53,7 @@ const TeachersTableComponent = () => {
     params.search = searchValue.trim();
   }
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["admins"],
+    queryKey: ["teacher"],
     queryFn: async () => {
       const res = await Myaxios.get(
         "/api/teacher/get-all-teachers",

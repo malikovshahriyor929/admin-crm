@@ -252,68 +252,74 @@ const AdminsTableComponent = () => {
           {!isLoading || isError
             ? data?.map((user: User, idx: number) => (
                 <TableRow key={user._id ? user._id : idx}>
-                    <TableCell>{user.first_name}</TableCell>
-                    <TableCell>{user.last_name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell className="capitalize">{user.role}</TableCell>
-                    <TableCell>{user.status}</TableCell>
-                    <TableCell className="text-right space-x-2 flex justify-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild className="">
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                  <TableCell>{user.first_name}</TableCell>
+                  <TableCell>{user.last_name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell className="capitalize">{user.role}</TableCell>
+                  <TableCell>{user.status}</TableCell>
+                  <TableCell className="text-right space-x-2 flex justify-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild className="">
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedUser(user);
+                            form.setValue("email", user.email);
+                            form.setValue("last_name", user.last_name);
+                            form.setValue("first_name", user.first_name);
+                            setOpen(true);
+                          }}
+                          className={`${
+                            user.status == "ishdan bo'shatilgan" && "hidden"
+                          } `}
+                        >
+                          Tahrirlash
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className={`${
+                            user.status == "ishdan bo'shatilgan" && "hidden"
+                          } `}
+                          onClick={() => delteAdmin(user)}
+                        >
+                          O&apos;chirish
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className={`${
+                            user.status == "ishdan bo'shatilgan" && "hidden"
+                          } ${user.status == "ta'tilda" && "hidden"}`}
+                          onClick={() => setTatil({ bool: true, id: user._id })}
+                        >
+                          Ta&apos;tilga chiqarish
+                        </DropdownMenuItem>
+                        {user.status == "ta'tilda" && (
                           <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedUser(user);
-                              form.setValue("email", user.email);
-                              form.setValue("last_name", user.last_name);
-                              form.setValue("first_name", user.first_name);
-                              setOpen(true);
-                            }}
+                            onClick={() => tatildanChiqish(user._id)}
                           >
-                            Tahrirlash
+                            Tatildan chiqrish
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => delteAdmin(user)}>
-                            O&apos;chirish
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className={`${
-                              user.status == "ishdan bo'shatilgan" && "hidden"
-                            } ${user.status == "ta'tilda" && "hidden"}`}
-                            onClick={() =>
-                              setTatil({ bool: true, id: user._id })
-                            }
-                          >
-                            Ta&apos;tilga chiqarish
-                          </DropdownMenuItem>
-                          {user.status == "ta'tilda" && (
-                            <DropdownMenuItem
-                              onClick={() => tatildanChiqish(user._id)}
-                            >
-                              Tatildan chiqrish
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            className={`${user.status == "faol" && "hidden"} ${
-                              user.status == "ta'tilda" && "hidden"
-                            }`}
-                            onClick={() => Hiring(user._id)}
-                          >
-                            Ishga qaytarish
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              Info({ _id: user._id });
-                            }}
-                          >
-                            Info
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                        )}
+                        <DropdownMenuItem
+                          className={`${user.status == "faol" && "hidden"} ${
+                            user.status == "ta'tilda" && "hidden"
+                          }`}
+                          onClick={() => Hiring(user._id)}
+                        >
+                          Ishga qaytarish
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            Info({ _id: user._id });
+                          }}
+                        >
+                          Info
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))
             : Array(10)

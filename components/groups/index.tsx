@@ -78,7 +78,9 @@ const GroupComponents = () => {
       },
     });
   };
-  console.log(data);
+  Myaxios.get("/api/group/one-group/68149a042e3c56611b242bc0").then((res) =>
+    console.log(res)
+  );
 
   return (
     <div>
@@ -89,44 +91,6 @@ const GroupComponents = () => {
           </h2>
           <div className="flex items-center gap-4 max-[470px]:gap-2 max-[460px]:  ">
             <Group_add_tool />
-
-            {/* {(params.search?.length ?? 0) > 0 && (
-              <Button size="sm" className="mb-4">
-                {searchValue !== "" && (
-                  <p className="font-medium truncate max-w-[40px]  ">
-                    {searchValue}
-                  </p>
-                )}
-                <div
-                  onClick={() => {
-                    setSearchValue("");
-                  }}
-                >
-                  <X />
-                </div>
-              </Button>
-            )} */}
-            {/* <Button
-              size="sm"
-              className="mb-4"
-              onClick={() => setSearch(!search)}
-            >
-              <Search size={30} />
-            </Button> */}
-            {/* <div className="mb-4">
-              <Select onValueChange={handleSelectChange} value={selectedStatus}>
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="ta'tilda">Tatilda</SelectItem>
-                    <SelectItem value="ishdan bo'shatilgan">Nofaol</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div> */}
           </div>
         </div>
         <Table>
@@ -170,8 +134,8 @@ const GroupComponents = () => {
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" >
-                          {!group.end_group == null && (
+                        <DropdownMenuContent align="end">
+                          {
                             <DropdownMenuItem
                               onClick={() => {
                                 setOpenEdit(true);
@@ -184,8 +148,8 @@ const GroupComponents = () => {
                             >
                               Tugash vaqtini belgilash
                             </DropdownMenuItem>
-                          )}
-                          {!group.end_group == null && (
+                          }
+                          {
                             <DropdownMenuItem
                               onClick={() => {
                                 deleteGroup({ _id: group._id });
@@ -193,7 +157,7 @@ const GroupComponents = () => {
                             >
                               Guruhni tugatish
                             </DropdownMenuItem>
-                          )}
+                          }
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -242,7 +206,7 @@ const GroupComponents = () => {
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit admins</DialogTitle>
+            <DialogTitle>Guruhni tahrirlash</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form

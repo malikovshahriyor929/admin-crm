@@ -222,9 +222,6 @@ const Student_tools = () => {
                                                   id: value._id,
                                                   name: value.name,
                                                 });
-                                                // form.setValue("groups", [
-                                                //   { group: value._id },
-                                                // ]);
                                               }}
                                             >
                                               <TableCell className="text-center">

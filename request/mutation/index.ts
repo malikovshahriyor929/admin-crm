@@ -124,25 +124,18 @@ export const useTatildaMutaion = () => {
   });
 };
 
-export const AddTaecherCase = () => {
-  const queryClient = useQueryClient();
-  return (data: any) => {
-    return queryClient.setQueryData(["teacher"], (old: User[]) => {
-      return [...old, { ...data }];
-    });
-  };
-};
 export const useAddTeacherMutaion = () => {
-  const AddTeacherCas = AddTaecherCase();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["teacher"],
     mutationFn: async (data: AddTeacherType) =>
-      Myaxios.post("/api/teacher/create-teacher", data).then((res) =>
-        AddTeacherCas(data)
-      ),
-    onSuccess(data) {
+      await Myaxios.post("/api/teacher/create-teacher", data),
+    onSuccess() {
       notify("addTeacher");
-      console.log(data);
+      queryClient.invalidateQueries({ queryKey: ["teacher"] });
+    },
+    onError() {
+      toast.error("Email oldin qo'shilgan!");
     },
   });
 };

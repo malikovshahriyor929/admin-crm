@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAddAdminMutaion } from "@/request/mutation";
+import { toast } from "sonner";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -71,6 +72,9 @@ const Admin_tools = () => {
         setOpen(false);
         form.reset();
       },
+      onError() {
+        toast.error("Email oldin qo'shilgan!");
+      },
     });
   };
   return (
@@ -80,7 +84,7 @@ const Admin_tools = () => {
         className="mb-4 flex items-center justify-center "
         size="sm"
       >
-        <Plus  />
+        <Plus />
         <p className="max-[620px]:hidden">Admin Qo&apos;shish</p>
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
