@@ -22,8 +22,6 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Myaxios } from "@/request/axios";
-import { toast } from "sonner";
 
 interface MangaCourseCardProps {
   course: CourseType;
@@ -45,7 +43,7 @@ export const CourseCard = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const formattedPrice = new Intl.NumberFormat("en-US").format(course.price);
-  const { register, handleSubmit, reset } = useForm({
+  const { register, handleSubmit } = useForm({
     defaultValues: {
       duration: course?.duration || "",
       price: course?.price || 0,

@@ -22,15 +22,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAddTeacherMutaion } from "@/request/mutation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Myaxios } from "@/request/axios";
-import { CourseType, TeacherType } from "@/types";
+import { CourseType } from "@/types";
 import useDebounce from "@/shared/generics/debounse";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -63,7 +56,6 @@ export interface AddTeacherType {
 const Teacher_tools = () => {
   const { mutate, isPending } = useAddTeacherMutaion();
   const [open, setOpen] = useState(false);
-  const [selectCourse, setSelectCourse] = useState<CourseType[]>();
   const [teacherId, setTeacherId] = useState<{ name: string; id: string }>({
     name: "",
     id: "",
@@ -174,7 +166,7 @@ const Teacher_tools = () => {
               <FormField
                 control={form.control}
                 name="course_id"
-                render={({ field }) => (
+                render={() => (
                   <FormItem className="relative ">
                     <FormLabel className="text-foreground">
                       Ustoz Sohasi
@@ -198,7 +190,6 @@ const Teacher_tools = () => {
                         ) : (
                           <div>
                             <Input
-                              {...field}
                               value={searchValue}
                               placeholder="Frontend"
                               onChange={(e) => setSearchValue(e.target.value)}
