@@ -182,8 +182,8 @@ const Teacher_tools = () => {
                             />
                             <X
                               onClick={() => {
-                                setTeacherId({ name: "", id: "" }),
-                                  setSearchValue("");
+                                setTeacherId({ name: "", id: "" });
+                                setSearchValue("");
                               }}
                             />
                           </div>

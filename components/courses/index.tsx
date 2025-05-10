@@ -76,7 +76,8 @@ const CoursesComponents = () => {
   const handleSubmit = (values: CourseFormValues) => {
     Myaxios.post("/api/course/create-course", values)
       .then((res) => {
-        toast.success(res.data.message), setIsModalOpen(false);
+        toast.success(res.data.message);
+        setIsModalOpen(false);
         setEditingCourse({
           name: "",
           description: "",
@@ -90,7 +91,7 @@ const CoursesComponents = () => {
 
   const handleEdit = async (data: editCourseType) => {
     console.log(data);
-    
+
     try {
       await Myaxios.post(`/api/course/edit-course`, {
         ...data,
