@@ -135,7 +135,7 @@ export const useAddTeacherMutaion = () => {
       queryClient.invalidateQueries({ queryKey: ["teacher"] });
     },
     onError() {
-      toast.error("Email oldin qo'shilgan!");
+      toast.error("Nimadur xato!");
     },
   });
 };

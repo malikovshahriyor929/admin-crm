@@ -78,9 +78,9 @@ const GroupComponents = () => {
       },
     });
   };
-  Myaxios.get("/api/group/one-group/68149a042e3c56611b242bc0").then((res) =>
-    console.log(res)
-  );
+  // Myaxios.get("/api/group/one-group/68149a042e3c56611b242bc0").then((res) =>
+  //   console.log(res)
+  // );
 
   return (
     <div>

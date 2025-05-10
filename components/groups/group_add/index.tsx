@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Myaxios } from "@/request/axios";
 import useDebounce from "@/shared/generics/debounse";
 import { useQuery } from "@tanstack/react-query";
-import { TeacherType } from "@/types";
+import { CourseType, TeacherType } from "@/types";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -36,15 +36,12 @@ import {
 } from "@/components/ui/table";
 import { useAddGroupMutation } from "@/request/mutation";
 const formSchema = z.object({
-  name: z
-    .string()
-    .min(5)
-    .regex(/N\d+$/, { message: "'N' bilan raqam bolishi kerak!" }),
+  course_id: z.string(),
   teacher: z.string(),
   started_group: z.string(),
 });
 export interface AddGroupType {
-  name: string;
+  course_id: string;
   teacher: string;
   started_group: string;
 }
@@ -60,11 +57,16 @@ const Group_add_tool = () => {
     name: "",
     id: "",
   });
+  const [courseId, setCourseId] = useState<teacherIdType>({
+    name: "",
+    id: "",
+  });
   const [searchValue, setSearchValue] = useState<string>("");
+  const [searchValueCourse, setSearchValueCourser] = useState<string>("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      course_id: "",
       teacher: "",
       started_group: "",
     },
@@ -72,7 +74,7 @@ const Group_add_tool = () => {
 
   const addAdmin = (values: z.infer<typeof formSchema>) => {
     mutate(
-      { ...values, teacher: teacherId.id },
+      { ...values, teacher: teacherId.id,course_id:courseId.id },
       {
         onSuccess() {
           setOpen(false);
@@ -88,18 +90,39 @@ const Group_add_tool = () => {
   };
 
   const debounce = useDebounce<string>(searchValue, 500);
+  const debounceCourse = useDebounce<string>(searchValueCourse, 500);
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["search-teacher"],
+    queryKey: ["search-teacher", debounce],
     queryFn: () =>
-      Myaxios.get("/api/group/search-teacher", { params: { name: debounce } }),
+      Myaxios.get("/api/group/search-teacher", {
+        params: { name: debounce },
+      }),
     enabled: debounce.trim() !== "",
+  });
+  const {
+    data: course,
+    isLoading: courseLoading,
+    isError: courseError,
+    refetch: courseRefetch,
+  } = useQuery<CourseType[]>({
+    queryKey: ["search-course", debounceCourse],
+    queryFn: () =>
+      Myaxios.get("/api/group/search-course", {
+        params: { name: debounceCourse },
+      }).then((res) => res.data.data),
+    enabled: debounceCourse.trim() !== "",
   });
   useEffect(() => {
     if (debounce.trim() !== "") {
       refetch();
     }
   }, [debounce, refetch]);
+  useEffect(() => {
+    if (debounceCourse.trim() !== "") {
+      courseRefetch();
+    }
+  }, [debounceCourse, courseRefetch]);
 
   return (
     <div className="flex items-center gap-4">
@@ -129,14 +152,99 @@ const Group_add_tool = () => {
             >
               <FormField
                 control={form.control}
-                name="name"
+                name="course_id"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem  className="relative ">
                     <FormLabel className="text-foreground">
                       Guruh nomi
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Frontend dasturlash N1" {...field} />
+                      {/* <Input placeholder="Frontend dasturlash N1" {...field} /> */}
+                      <div>
+                        {courseId.id ? (
+                          <div className="flex items-center justify-between">
+                            <Input
+                              className="w-[93%]"
+                              readOnly
+                              value={courseId.name}
+                            />
+                            <X
+                              onClick={() => setCourseId({ name: "", id: "" })}
+                            />
+                          </div>
+                        ) : (
+                          <div>
+                            <Input
+                              {...field}
+                              value={searchValueCourse}
+                              placeholder="Davron"
+                              onChange={(e) =>
+                                setSearchValueCourser(e.target.value)
+                              }
+                            />
+                            {course?.length && (
+                              <div
+                                className={`absolute  overflow-y-auto z-50 h-[200px] top-17 rounded-xl p-2 flex flex-col gap-3  border border-accent-foreground/40 !bg-[#161514] w-full  ${
+                                  !course?.length && "!h-[140px] !pb-0"
+                                }  `}
+                              >
+                                <Table className="!bg-[#161514] z-50">
+                                  <TableHeader>
+                                    <TableRow className="sticky top-0 !bg-[#161514] ">
+                                      <TableHead className="w-[30px]">
+                                        No
+                                      </TableHead>
+                                      <TableHead>Nomi</TableHead>
+                                      <TableHead>Narxi</TableHead>
+                                      {/* <TableHead>Haqida</TableHead> */}
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {!courseLoading || !courseError
+                                      ? course?.map(
+                                          (
+                                            teacher: CourseType,
+                                            idx: number
+                                          ) => (
+                                            <TableRow
+                                              key={teacher._id}
+                                              onClick={() =>
+                                                setCourseId({
+                                                  id: teacher._id,
+                                                  name: teacher.name.name,
+                                                })
+                                              }
+                                            >
+                                              <TableCell className="text-center">
+                                                {idx + 1}
+                                              </TableCell>
+                                              <TableCell className="pl-2 font-medium">
+                                                {teacher.name.name}
+                                              </TableCell>
+                                              <TableCell>
+                                                {teacher.price}
+                                              </TableCell>
+                                              {/* <TableCell
+                                                  onClick={() =>
+                                                    router.push(
+                                                      `teachers/${teacher._id}`
+                                                    )
+                                                  }
+                                                  className="pr-3"
+                                                >
+                                                  <Info />
+                                                </TableCell> */}
+                                            </TableRow>
+                                          )
+                                        )
+                                      : "..loading"}
+                                  </TableBody>
+                                </Table>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage className="text-red-500" />
                   </FormItem>
@@ -254,7 +362,7 @@ const Group_add_tool = () => {
                 )}
               />
               <DialogFooter>
-                <Button  type="submit">
+                <Button type="submit">
                   {isLoading ? (
                     <Loader className="animate-spin " />
                   ) : (

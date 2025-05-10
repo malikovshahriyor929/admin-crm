@@ -116,3 +116,30 @@ export interface studentMutationType {
   phone: string;
   groups: { group: string }[];
 }
+
+// courses type
+export interface NameDetailsType {
+  createdAt: string | Date;
+  name: string;
+  updatedAt: string | Date;
+  __v: number;
+  _id: string;
+}
+
+export interface CourseType {
+  createdAt: string | Date;
+  description: string;
+  duration: string;
+  name: NameDetailsType;
+  price: number;
+  is_freeze:boolean
+  updatedAt: string | Date;
+  __v: number;
+  _id: string;
+}
+
+export interface editCourseType {
+  course_id?: string;
+  duration: string;
+  price: number;
+}

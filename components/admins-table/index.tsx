@@ -485,7 +485,7 @@ const AdminsTableComponent = () => {
       <Dialog open={search} onOpenChange={setSearch}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>Search Admins</DialogTitle>
           </DialogHeader>
           <form onSubmit={SearchFn} className="flex flex-col gap-5">
             <Input

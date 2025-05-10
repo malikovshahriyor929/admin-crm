@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "../../ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader, Plus } from "lucide-react";
+import { Loader, Plus, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -29,6 +29,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Myaxios } from "@/request/axios";
+import { CourseType, TeacherType } from "@/types";
+import useDebounce from "@/shared/generics/debounse";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 const formSchema = z.object({
   email: z.string().email("To‘g‘ri email kiriting").min(5),
   last_name: z.string().min(5),
@@ -38,7 +50,7 @@ const formSchema = z.object({
     .string()
     .min(5)
     .startsWith("+998", { message: "Iltimos O'zbek nomeridan kiring" }),
-  field: z.string(),
+  course_id: z.string(),
 });
 export interface AddTeacherType {
   first_name: string;
@@ -46,11 +58,17 @@ export interface AddTeacherType {
   email: string;
   phone: string;
   password: string;
-  field: string;
+  course_id: string;
 }
 const Teacher_tools = () => {
   const { mutate, isPending } = useAddTeacherMutaion();
   const [open, setOpen] = useState(false);
+  const [selectCourse, setSelectCourse] = useState<CourseType[]>();
+  const [teacherId, setTeacherId] = useState<{ name: string; id: string }>({
+    name: "",
+    id: "",
+  });
+  const [searchValue, setSearchValue] = useState<string>("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,19 +77,38 @@ const Teacher_tools = () => {
       email: "",
       password: "",
       phone: "",
-      field: "",
+      course_id: "",
     },
   });
   const addAdmin = (values: z.infer<typeof formSchema>) => {
-    mutate(values, {
-      onSuccess() {
-        form.reset();
-        setOpen(false);
-      },
-    });
+    console.log({ ...values, course_id: teacherId.id });
+    mutate(
+      { ...values, course_id: teacherId.id },
+      {
+        onSuccess() {
+          form.reset();
+          setOpen(false);
+        },
+      }
+    );
     form.reset();
     setOpen(false);
   };
+  const debounce = useDebounce<string>(searchValue, 500);
+
+  const { data, isLoading, refetch } = useQuery<CourseType[]>({
+    queryKey: ["search-course"],
+    queryFn: () =>
+      Myaxios.get("/api/group/search-course", {
+        params: { name: debounce },
+      }).then((res) => res.data.data),
+    enabled: debounce.trim() !== "",
+  });
+  useEffect(() => {
+    if (debounce.trim() !== "") {
+      refetch();
+    }
+  }, [debounce, refetch, data, searchValue]);
   return (
     <div className="flex items-center gap-4">
       <Button
@@ -133,6 +170,125 @@ const Teacher_tools = () => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="course_id"
+                render={({ field }) => (
+                  <FormItem className="relative ">
+                    <FormLabel className="text-foreground">
+                      Ustoz Sohasi
+                    </FormLabel>
+                    <FormControl>
+                      <div>
+                        {teacherId.id ? (
+                          <div className="flex items-center justify-between">
+                            <Input
+                              className="w-[93%]"
+                              readOnly
+                              value={teacherId.name}
+                            />
+                            <X
+                              onClick={() => {
+                                setTeacherId({ name: "", id: "" }),
+                                  setSearchValue("");
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div>
+                            <Input
+                              {...field}
+                              value={searchValue}
+                              placeholder="Frontend"
+                              onChange={(e) => setSearchValue(e.target.value)}
+                            />
+                            {data?.length && (
+                              <div
+                                className={`absolute  overflow-y-auto h-[200px] top-17 rounded-xl p-2 flex flex-col gap-3  border border-accent-foreground/40 bg-[#161514] w-full  ${
+                                  data?.length > 4
+                                    ? "!h-[140px] !pb-0"
+                                    : "h-fit !pb-3"
+                                }  `}
+                              >
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow className="sticky top-0 bg-[#161514] ">
+                                      <TableHead className="w-[30px]">
+                                        No
+                                      </TableHead>
+                                      <TableHead>Nomi</TableHead>
+                                      <TableHead>Narxi</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {!isLoading
+                                      ? data?.map(
+                                          (
+                                            teacher: CourseType,
+                                            idx: number
+                                          ) => (
+                                            <TableRow
+                                              key={teacher._id}
+                                              onClick={() =>
+                                                setTeacherId({
+                                                  id: teacher._id,
+                                                  name: teacher.name.name,
+                                                })
+                                              }
+                                            >
+                                              <TableCell className="text-center">
+                                                {idx + 1}
+                                              </TableCell>
+                                              <TableCell className="pl-2 font-medium">
+                                                {teacher.name.name}
+                                              </TableCell>
+                                              <TableCell>
+                                                {teacher.price}
+                                              </TableCell>
+                                              {/* <TableCell
+                                                onClick={() =>
+                                                  router.push(
+                                                    `teachers/${teacher._id}`
+                                                  )
+                                                }
+                                                className="pr-3"
+                                              >
+                                                <Info />
+                                              </TableCell> */}
+                                            </TableRow>
+                                          )
+                                        )
+                                      : "..loading"}
+                                  </TableBody>
+                                </Table>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    {/* <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Ustoz yo'nalishini tanlang" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {selectCourse?.map((value) => (
+                          <SelectItem key={value._id} value={value.name.name}>
+                            {value.name.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select> */}
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="phone"
@@ -146,40 +302,6 @@ const Teacher_tools = () => {
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="field"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-foreground">
-                      Ustoz turi
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Ustoz yo'nalishini tanlang" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Frontend dasturlash">
-                          Frontend dasturlash
-                        </SelectItem>
-                        <SelectItem value="Backend dasturlash">
-                          Backend dasturlash
-                        </SelectItem>
-                        <SelectItem value="Rus tili">Rus tili</SelectItem>
-                        <SelectItem value="Ingliz tili">Ingliz tili</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="password"
