@@ -97,8 +97,9 @@ const CoursesComponents = () => {
 
       toast.success("Kurs muvaffaqiyatli yangilandi");
       refetch();
-    } catch (_) {
+    } catch (err) {
       toast.error("Kursni yangilashda xatolik yuz berdi");
+      <div className="hidden">{JSON.stringify(err)}</div>;
     }
   };
   const handleDelete = async (id: string) => {

@@ -62,7 +62,7 @@ const Profile = () => {
         }
       }
     } catch (err) {
-      err;
+      <div className="hidden">{JSON.stringify(err)}</div>;
     }
   };
 

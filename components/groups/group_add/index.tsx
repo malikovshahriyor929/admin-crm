@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 
 import { Myaxios } from "@/request/axios";
 import useDebounce from "@/shared/generics/debounse";
-import { useQuery } from "@tanstack/react-query";
+import { QueryObserverResult, useQuery } from "@tanstack/react-query";
 import { CourseType, TeacherType } from "@/types";
 import { useRouter } from "next/navigation";
 import {
@@ -49,7 +49,13 @@ interface teacherIdType {
   name: string;
   id: string;
 }
-const Group_add_tool = ({ tool }: { tool: Function }) => {
+
+type GroupAddToolProps<TData = unknown, TError = unknown> = {
+  tool: () => Promise<QueryObserverResult<TData, TError>>;
+};
+const Group_add_tool = <TData, TError>({
+  tool,
+}: GroupAddToolProps<TData, TError>) => {
   const { mutate } = useAddGroupMutation();
   const [open, setOpen] = useState(false);
   const router = useRouter();
