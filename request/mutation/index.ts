@@ -82,7 +82,6 @@ export const useAddAdminMutaion = () => {
     },
     onSuccess(data) {
       notify("add");
-      console.log(data);
     },
   });
 };
@@ -158,7 +157,6 @@ export const useAddGroupMutation = () => {
     },
     onSuccess(data) {
       notify("addGroup");
-      console.log(data);
     },
   });
 };
@@ -189,7 +187,6 @@ export const useAddStrudentMutation = () => {
     mutationFn: async (data: studentMutationType) =>
       Myaxios.post("/api/student/create-student", data).then((res) => {
         AddGroupCas(data);
-        console.log(res);
       }),
     onSuccess() {
       notify("addStundent");

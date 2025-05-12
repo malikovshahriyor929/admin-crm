@@ -90,8 +90,6 @@ const CoursesComponents = () => {
   };
 
   const handleEdit = async (data: editCourseType) => {
-    console.log(data);
-
     try {
       await Myaxios.post(`/api/course/edit-course`, {
         ...data,
@@ -99,9 +97,8 @@ const CoursesComponents = () => {
 
       toast.success("Kurs muvaffaqiyatli yangilandi");
       refetch();
-    } catch (error) {
+    } catch (_) {
       toast.error("Kursni yangilashda xatolik yuz berdi");
-      console.error("Delete error:", error);
     }
   };
   const handleDelete = async (id: string) => {
@@ -112,9 +109,9 @@ const CoursesComponents = () => {
       });
       toast.success("Kurs muvaffaqiyatli o'chirildi");
       refetch();
-    } catch (error) {
+    } catch (err) {
       toast.error("Kursni o'chirishda xatolik yuz berdi");
-      console.error("Delete error:", error);
+      <div className="hidden">{JSON.stringify(err)}</div>;
     } finally {
       setDeletingId(null);
     }
@@ -125,7 +122,7 @@ const CoursesComponents = () => {
         toast.success(res.data.message);
         refetch();
       })
-      .catch((rej) => toast.error("Nimadur xato manager bilan uchrashing!"));
+      .catch(() => toast.error("Nimadur xato manager bilan uchrashing!"));
   };
   const unfreeze = (id: string) => {
     Myaxios.put("/api/course/unfreeze-course", { course_id: id })
@@ -133,7 +130,7 @@ const CoursesComponents = () => {
         toast.success(res.data.message);
         refetch();
       })
-      .catch((rej) => toast.error("Nimadur xato manager bilan uchrashing!"));
+      .catch(() => toast.error("Nimadur xato manager bilan uchrashing!"));
   };
   return (
     <div>

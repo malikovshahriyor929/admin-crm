@@ -28,12 +28,8 @@ const Profile = () => {
     if (typeof window !== "undefined") {
       const cookieData = Cookies.get("user");
       if (cookieData) {
-        try {
-          const parsed = JSON.parse(cookieData);
-          setUserInfo(parsed);
-        } catch (err) {
-          console.error("Invalid JSON in cookie", err);
-        }
+        const parsed = JSON.parse(cookieData);
+        setUserInfo(parsed);
       }
     }
   }, []);
@@ -60,16 +56,13 @@ const Profile = () => {
         setUserInfo({ ...userInfo, image: data.image });
         const parsed: User = JSON.parse(cookieData!);
         Cookies.set("user", JSON.stringify({ ...parsed, image: data.image }));
-        console.log("Upload successful!", window.location.reload());
-
+        window.location.reload();
         if (data.imageUrl) {
           setUserInfo((prev) => ({ ...prev, image: data.imageUrl }));
         }
-      } else {
-        console.error("Upload failed");
       }
-    } catch (error) {
-      console.error("Error uploading:", error);
+    } catch (err) {
+      err;
     }
   };
 

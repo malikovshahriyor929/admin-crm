@@ -12,9 +12,7 @@ const Courses = async () => {
   await queryClient.prefetchQuery({
     queryKey: ["courses"],
     queryFn: async () =>
-      await Myaxios.get("/api/course/get-courses").then((res) =>
-        console.log(res.data)
-      ),
+      await Myaxios.get("/api/course/get-courses").then((res) => res.data.data),
   });
   const dehydratedState = dehydrate(queryClient);
   return (

@@ -125,10 +125,12 @@ const AdminsTableComponent = () => {
         status: selectedUser?.status,
       },
       {
-        onSuccess(data) {
-          console.log(data);
+        onSuccess() {
           setOpen(false);
           form.reset();
+        },
+        onError() {
+          toast.success("Nimadur xato qayta urinib ko'ring!");
         },
       }
     );
@@ -141,10 +143,12 @@ const AdminsTableComponent = () => {
       headers: {
         Authorization: `Bearer ${Cookies.get("token")}`,
       },
-    }).then(() => {
-      deleteAdminCas(data);
-      refetch();
-    });
+    })
+      .then(() => {
+        deleteAdminCas(data);
+        refetch();
+      })
+      .catch(() => toast.success("Nimadur xato qayta urinib ko'ring!"));
   };
   const tatilFn = (values: z.infer<typeof tatilSchema>) => {
     tatilMutate(
@@ -155,13 +159,17 @@ const AdminsTableComponent = () => {
           tatilForm.reset();
           refetch();
         },
+        onError() {
+          toast.success("Nimadur xato qayta urinib ko'ring!");
+        },
       }
     );
   };
   const tatildanChiqish = (id: string) => {
-    Myaxios.post("/api/staff/leave-exit-staff", { _id: id }).then(() =>
-      refetch()
-    );
+    Myaxios.post("/api/staff/leave-exit-staff", { _id: id })
+      .then(() => refetch())
+      .then(() => toast.success("Tatildan chiqarish!"))
+      .catch(() => toast.success("Nimadur xato qayta urinib ko'ring!"));
   };
   const handleSelectChange = (value: string) => {
     setSelectedStatus(value);

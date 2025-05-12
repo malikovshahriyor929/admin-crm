@@ -49,7 +49,7 @@ interface teacherIdType {
   name: string;
   id: string;
 }
-const Group_add_tool = () => {
+const Group_add_tool = ({ tool }: { tool: Function }) => {
   const { mutate } = useAddGroupMutation();
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -74,7 +74,7 @@ const Group_add_tool = () => {
 
   const addAdmin = (values: z.infer<typeof formSchema>) => {
     mutate(
-      { ...values, teacher: teacherId.id,course_id:courseId.id },
+      { ...values, teacher: teacherId.id, course_id: courseId.id },
       {
         onSuccess() {
           setOpen(false);
@@ -84,6 +84,7 @@ const Group_add_tool = () => {
             id: "",
           });
           setSearchValue("");
+          tool();
         },
       }
     );
@@ -154,7 +155,7 @@ const Group_add_tool = () => {
                 control={form.control}
                 name="course_id"
                 render={({ field }) => (
-                  <FormItem  className="relative ">
+                  <FormItem className="relative ">
                     <FormLabel className="text-foreground">
                       Guruh nomi
                     </FormLabel>

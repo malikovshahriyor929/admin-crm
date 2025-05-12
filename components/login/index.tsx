@@ -40,7 +40,6 @@ const LoginComponents = () => {
   useEffect(() => {
     if (isSuccess) {
       router.push("/");
-      console.log(isSuccess);
     }
   }, [isPending, isSuccess, router]);
 

@@ -85,9 +85,6 @@ const GroupComponents = () => {
       },
     });
   };
-  // Myaxios.get("/api/group/one-group/68149a042e3c56611b242bc0").then((res) =>
-  //   console.log(res)
-  // );
 
   return (
     <div>
@@ -97,7 +94,7 @@ const GroupComponents = () => {
             Guruhlar ro&apos;yxati
           </h2>
           <div className="flex items-center gap-4 max-[470px]:gap-2 max-[460px]:  ">
-            <Group_add_tool />
+            <Group_add_tool tool={refetch} />
           </div>
         </div>
         <Table>
@@ -168,7 +165,7 @@ const GroupComponents = () => {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
-                  </TableRow>
+           </TableRow>
                 ))
               : Array(10)
                   .fill(1)

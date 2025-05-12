@@ -95,9 +95,8 @@ const TeachersTableComponent = () => {
     });
   };
   const hiring = (id: string) => {
-    Myaxios.post("api/teacher/return-teacher", { _id: id }).then((res) => {
+    Myaxios.post("api/teacher/return-teacher", { _id: id }).then(() => {
       refetch();
-      console.log(res.data);
     });
   };
   //   const tatilFn = () => {};

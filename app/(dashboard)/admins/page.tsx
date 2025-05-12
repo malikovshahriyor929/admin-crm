@@ -12,8 +12,7 @@ const Admins = async () => {
   await queryClient.prefetchQuery({
     queryKey: ["admins"],
     queryFn: async () =>
-      await Myaxios.get("/api/staff/all-admins").then((res) =>
-        console.log(res.data)
+      await Myaxios.get("/api/staff/all-admins").then((res) =>res.data.data
       ),
   });
   const dehydratedState = dehydrate(queryClient);

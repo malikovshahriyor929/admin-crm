@@ -99,8 +99,6 @@ const StudentsComponents = () => {
   };
   const leaveStudent = (e: FormEvent) => {
     e.preventDefault();
-    console.log({ ...tatildaValue, _id: tatil.id });
-
     Myaxios.post("/api/student/leave-student", {
       ...tatildaValue,
       student_id: tatil.id,

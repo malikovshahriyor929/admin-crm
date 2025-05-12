@@ -23,7 +23,6 @@ const Student_info_component = ({ id }: { id: string }) => {
   }, [id]);
 
   if (!data) return <p>Loading...</p>;
-  console.log(data);
 
   return (
     <div className="p-6 space-y-6">
@@ -64,8 +63,9 @@ const Student_info_component = ({ id }: { id: string }) => {
               </div>
             </div>
             <div className="flex items-center gap-3 max-[330px]:!text-sm">
-         
-              <p className="max-[450px]:flex hidden max-[330px]:!text-sm">Yaratilgan vaqt:</p>
+              <p className="max-[450px]:flex hidden max-[330px]:!text-sm">
+                Yaratilgan vaqt:
+              </p>
               {data.createdAt.slice(0, 10)}
             </div>
           </div>

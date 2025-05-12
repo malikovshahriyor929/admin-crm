@@ -12,8 +12,7 @@ const Teachers = async () => {
   await queryClient.prefetchQuery({
     queryKey: ["teacher"],
     queryFn: () =>
-      Myaxios.get("/api/teacher/get-all-teachers").then((res) =>
-        console.log(res.data)
+      Myaxios.get("/api/teacher/get-all-teachers").then((res) =>res.data.data
       ),
   });
   const dehydratedState = dehydrate(queryClient);

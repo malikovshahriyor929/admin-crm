@@ -73,7 +73,6 @@ const Teacher_tools = () => {
     },
   });
   const addAdmin = (values: z.infer<typeof formSchema>) => {
-    console.log({ ...values, course_id: teacherId.id });
     mutate(
       { ...values, course_id: teacherId.id },
       {
