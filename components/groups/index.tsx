@@ -41,6 +41,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { useEditGroupMutation } from "@/request/mutation";
+import { toast } from "sonner";
 const formSchema = z.object({
   date: z.string(),
 });
@@ -55,9 +56,14 @@ const GroupComponents = () => {
       Myaxios.get("/api/group/get-all-group").then((res) => res.data.data),
   });
   const deleteGroup = ({ _id }: deleteGroupType) => {
-    Myaxios.delete("/api/group/end-group", { data: { _id } }).then(() =>
-      refetch()
-    );
+    Myaxios.delete("/api/group/end-group", { data: { _id } })
+      .then(() => {
+        toast.success("Muvoffaqatli tugatildi!");
+        refetch();
+      })
+      .catch(() => {
+        toast.success("Nimadur xato qayta urinib ko'ring!");
+      });
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,6 +79,7 @@ const GroupComponents = () => {
     mutate(value, {
       onSuccess() {
         refetch();
+        toast.success("Muvoffaqatli guruh tugatildi!");
         setOpenEdit(false);
         form.reset();
       },

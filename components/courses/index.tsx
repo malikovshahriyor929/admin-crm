@@ -120,18 +120,20 @@ const CoursesComponents = () => {
     }
   };
   const freeze = (id: string) => {
-    Myaxios.put("/api/course/freeze-course", { course_id: id }).then((res) => {
-      toast.success(res.data.message);
-      refetch();
-    });
-  };
-  const unfreeze = (id: string) => {
-    Myaxios.put("/api/course/unfreeze-course", { course_id: id }).then(
-      (res) => {
+    Myaxios.put("/api/course/freeze-course", { course_id: id })
+      .then((res) => {
         toast.success(res.data.message);
         refetch();
-      }
-    );
+      })
+      .catch((rej) => toast.error("Nimadur xato manager bilan uchrashing!"));
+  };
+  const unfreeze = (id: string) => {
+    Myaxios.put("/api/course/unfreeze-course", { course_id: id })
+      .then((res) => {
+        toast.success(res.data.message);
+        refetch();
+      })
+      .catch((rej) => toast.error("Nimadur xato manager bilan uchrashing!"));
   };
   return (
     <div>
